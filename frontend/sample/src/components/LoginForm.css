@@ -1,0 +1,84 @@
+.login-container {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(to bottom right, #f0f4ff, #cfd8ff);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.login-box {
+  background-color: white;
+  padding: 40px 50px;
+  border-radius: 20px;
+  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  width: 360px;
+}
+
+.icon-wrapper {
+  background-color: #3b82f6;
+  width: 60px;
+  height: 60px;
+  margin: 0 auto 20px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-icon {
+  color: white;
+  font-size: 32px;
+}
+
+.team-name {
+  color: #3b82f6;
+  font-size: 24px;
+  font-weight: 700;
+  margin: 10px 0;
+}
+
+.welcome-text {
+  color: #4b5563;
+  margin-bottom: 30px;
+}
+
+.input-field {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+  margin-bottom: 15px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s ease-in-out;
+}
+
+.input-field:focus {
+  border-color: #3b82f6;
+}
+
+.sign-in-button {
+  width: 100%;
+  background: linear-gradient(to right, #3b82f6, #6366f1);
+  color: white;
+  font-weight: 600;
+  padding: 12px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: background 0.3s ease;
+}
+
+.sign-in-button:hover {
+  background: linear-gradient(to right, #2563eb, #4f46e5);
+}
+
+.forgot-password {
+  color: #2563eb;
+  margin-top: 20px;
+  cursor: pointer;
+  font-size: 14px;
+}
