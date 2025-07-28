@@ -1,11 +1,12 @@
-:root {
+/* :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  background-color: #ffffffe6;
+
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -65,4 +66,17 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
+} */
+/* index.css */
+header {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  z-index: 1000;
+}
+
+.page-logo {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
 }

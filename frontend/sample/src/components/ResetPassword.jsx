@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import './LoginForm.css';
 import { useLocation, useNavigate } from 'react-router-dom';
-import LockResetIcon from '@mui/icons-material/LockReset';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const ResetPassword = () => {
   const location = useLocation();
@@ -21,14 +22,16 @@ const ResetPassword = () => {
       });
 
       const data = await res.json();
+
       if (res.ok) {
-        alert('Password has been reset');
-        navigate('/');
+        toast.success('✅ Password has been reset!');
+        setTimeout(() => navigate('/'), 1500); // Slight delay for user to see toast
       } else {
-        alert(data.message || 'Invalid or expired code');
+        toast.error(data.message || '❌ Invalid or expired reset code');
       }
     } catch (error) {
-      alert('An error occurred. Please try again.',error);
+      toast.error('⚠️ An error occurred. Please try again.');
+      console.error('Reset password error:', error);
     }
   };
 
@@ -36,10 +39,11 @@ const ResetPassword = () => {
     <div className="login-container">
       <div className="login-box">
         <div className="icon-wrapper">
-          <LockResetIcon className="login-icon" />
+          <img src="/image.png" alt="Company Logo" className="company-logo" />
         </div>
-        <h2 className="team-name">DP Team</h2>
+        <h2 className="team-name">VDart</h2>
         <p className="welcome-text">Enter reset code & new password</p>
+
         <form onSubmit={handleSubmit} className="login-form">
           <input
             type="text"
@@ -61,10 +65,13 @@ const ResetPassword = () => {
             Reset Password
           </button>
         </form>
+
         <p className="forgot-password" onClick={() => navigate('/')}>
           Back to Login
         </p>
       </div>
+
+      <ToastContainer position="top-center" autoClose={3000} />
     </div>
   );
 };

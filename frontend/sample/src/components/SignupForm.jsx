@@ -14,7 +14,7 @@ const SignupForm = () => {
     e.preventDefault();
 
     if (password !== confirmPassword) {
-      alert("⚠️ Passwords do not match");
+      alert(" Passwords do not match");
       return;
     }
 
@@ -32,14 +32,14 @@ const SignupForm = () => {
       const data = await response.json();
 
       if (response.ok) {
-        alert('✅ Registration successful!');
-        navigate('/'); // Navigate to login page
+        alert(' Registration successful!');
+        navigate('/'); 
       } else {
-        alert(`❌ ${data.message || 'Signup failed'}`);
+        alert(` ${data.message || 'Signup failed'}`);
       }
     } catch (error) {
       console.error('Signup error:', error);
-      alert('⚠️ Something went wrong. Please try again later.');
+      alert(' Something went wrong. Please try again later.');
     } finally {
       setLoading(false);
     }
@@ -49,9 +49,10 @@ const SignupForm = () => {
     <div className="login-container">
       <div className="login-box">
         <div className="icon-wrapper">
-          <PersonAddIcon className="login-icon" />
-        </div>
-        <h2 className="team-name">DP Team</h2>
+  <img src="/image.png" alt="Company Logo" className="company-logo" />
+</div>
+
+        <h2 className="team-name">VDart</h2>
         <p className="welcome-text">Create your account</p>
 
         <form onSubmit={handleSubmit} className="login-form">

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import './LoginForm.css';
 import { useNavigate } from 'react-router-dom';
-import PersonIcon from '@mui/icons-material/Person';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const LoginForm = () => {
   const [email, setEmail] = useState('');
@@ -23,14 +24,13 @@ const LoginForm = () => {
       const data = await response.json();
 
       if (response.ok) {
-        alert('✅ Login successful!');
-        console.log('Logged in user:', data.user);
-        navigate('/dashboard'); // You can replace with your actual route
+        toast.success('✅ Login successful!');
+        navigate('/dashboard');
       } else {
-        alert(`❌ ${data.message}`);
+        toast.error(`❌ ${data.message}`);
       }
     } catch (error) {
-      alert('⚠️ Server error. Please try again later.');
+      toast.error('⚠️ Server error. Please try again later.');
       console.error('Login error:', error);
     }
 
@@ -41,10 +41,12 @@ const LoginForm = () => {
     <div className="login-container">
       <div className="login-box">
         <div className="icon-wrapper">
-          <PersonIcon className="login-icon" />
+          <img src="/image.png" alt="Company Logo" className="company-logo" />
         </div>
-        <h2 className="team-name">DP Team</h2>
+
+        <h2 className="team-name">VDart</h2>
         <p className="welcome-text">Welcome back to your workspace</p>
+
         <form onSubmit={handleSubmit} className="login-form">
           <input
             type="email"
@@ -66,16 +68,19 @@ const LoginForm = () => {
             {loading ? 'Signing in...' : 'Sign In'}
           </button>
         </form>
-        
+
         <p className="forgot-password" onClick={() => navigate('/forgot-password')}>
           Forgot your password?
         </p>
 
-        {/* ➕ Added Sign Up link below */}
-        <p className="signup-link" onClick={() => navigate('/signup')}>
+        {/* ➕ Optional Sign Up link */}
+        {/* <p className="signup-link" onClick={() => navigate('/signup')}>
           Don't have an account? <strong>Sign Up</strong>
-        </p>
+        </p> */}
       </div>
+
+      {/* Toast notifications container */}
+      <ToastContainer position="top-center" autoClose={3000} />
     </div>
   );
 };

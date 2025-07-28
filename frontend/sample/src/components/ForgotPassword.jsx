@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import './LoginForm.css';
 import { useNavigate } from 'react-router-dom';
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
@@ -18,14 +20,18 @@ const ForgotPassword = () => {
       });
 
       const data = await res.json();
+
       if (res.ok) {
-        alert('Reset code sent to your email');
-        navigate('/reset-password', { state: { email } });
+        toast.success('📩 Reset code sent to your email');
+        setTimeout(() => {
+          navigate('/reset-password', { state: { email } });
+        }, 1500); // Delay so user sees the toast
       } else {
-        alert(data.message || 'Failed to send reset code');
+        toast.error(data.message || '❌ Failed to send reset code');
       }
     } catch (e) {
-      alert('An error occurred. Please try again.',e);
+      toast.error('⚠️ An error occurred. Please try again.');
+      console.error('Forgot Password Error:', e);
     }
   };
 
@@ -33,10 +39,11 @@ const ForgotPassword = () => {
     <div className="login-container">
       <div className="login-box">
         <div className="icon-wrapper">
-          <MailOutlineIcon className="login-icon" />
+          <img src="/image.png" alt="Company Logo" className="company-logo" />
         </div>
-        <h2 className="team-name">DP Team</h2>
+        <h2 className="team-name">VDart</h2>
         <p className="welcome-text">Reset your password</p>
+
         <form onSubmit={handleSubmit} className="login-form">
           <input
             type="email"
@@ -50,10 +57,13 @@ const ForgotPassword = () => {
             Send Reset Code
           </button>
         </form>
+
         <p className="forgot-password" onClick={() => navigate('/')}>
           Back to Login
         </p>
       </div>
+
+      <ToastContainer position="top-center" autoClose={3000} />
     </div>
   );
 };

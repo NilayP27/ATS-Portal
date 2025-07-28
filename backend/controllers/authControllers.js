@@ -2,7 +2,6 @@ const User = require('../models/User');
 const bcrypt = require('bcrypt');
 const sendEmail = require('../utils/sendEmail');
 
-// ✅ Signup controller added
 exports.signup = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -12,7 +11,7 @@ exports.signup = async (req, res) => {
       return res.status(400).json({ message: "User already exists" });
     }
 
-    const user = new User({ email, password }); // no manual hashing
+    const user = new User({ email, password }); 
     await user.save();
 
     res.status(201).json({ message: "User registered successfully", user });
@@ -76,7 +75,7 @@ exports.resetPassword = async (req, res) => {
       return res.status(400).json({ message: 'Invalid or expired code' });
     }
 
-    user.password = newPassword; // let pre('save') hash it
+    user.password = newPassword; 
     user.resetCode = undefined;
     user.resetCodeExpires = undefined;
     await user.save();
