@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom'; // 👈 Import useNavigate
 import './CandidateList.css';
 
 const candidates = [
@@ -13,10 +14,14 @@ const candidates = [
 ];
 
 const CandidateList = () => {
+  const navigate = useNavigate(); // 👈 Initialize navigate function
+
   return (
     <div className="page-container">
       <div className="header">
-        <span className="back-arrow">&#8592;</span>
+        <span className="back-arrow" onClick={() => navigate('/dashboard')}>
+          &#8592;
+        </span>
         <div>
           <h1 className="title">Frontend Developer</h1>
           <p className="subtitle">Candidate overview and progress</p>
