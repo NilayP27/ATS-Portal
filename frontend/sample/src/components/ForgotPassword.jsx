@@ -25,7 +25,7 @@ const ForgotPassword = () => {
         toast.success('📩 Reset code sent to your email');
         setTimeout(() => {
           navigate('/reset-password', { state: { email } });
-        }, 1500); // Delay so user sees the toast
+        }, 1000);
       } else {
         toast.error(data.message || '❌ Failed to send reset code');
       }

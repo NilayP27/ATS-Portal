@@ -1,0 +1,45 @@
+/* components/JobCard.module.css */
+.card {
+  background-color: white;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.06);
+  width: 100%;
+  max-width: 500px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.meta p {
+  margin: 0.2rem 0;
+}
+
+.summary {
+  margin-top: 1rem;
+  background: #f0f6ff;
+  padding: 1rem;
+  border-radius: 12px;
+}
+
+.counts {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.5rem;
+}
+
+.pass {
+  color: green;
+}
+
+.reject {
+  color: red;
+}
+
+.eyeIcon {
+  color: #275df5;
+  cursor: pointer;
+}

@@ -3,10 +3,16 @@ import styles from './Dashboard.module.css';
 import { useNavigate } from 'react-router-dom';
 
 const Dashboard = () => {
-    const navigate = useNavigate(); // <-- Add this line
-    const handleCreateProject = () => {
-    navigate('/create-project'); // <-- Route to CreateProject page
+  const navigate = useNavigate();
+
+  const handleCreateProject = () => {
+    navigate('/create-project');
   };
+
+  const handleProjectClick = (projectId) => {
+    navigate(`/project-review/${projectId}`);
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.header}>
@@ -14,7 +20,9 @@ const Dashboard = () => {
           <h2 className={styles.title}>VDart Team Dashboard</h2>
           <p className={styles.subtitle}>Manage your recruitment projects</p>
         </div>
-        <button className={styles.createButton} onClick={handleCreateProject}>+ Create Project</button>
+        <button className={styles.createButton} onClick={handleCreateProject}>
+          + Create Project
+        </button>
       </div>
 
       <div className={styles.cardGrid}>
@@ -25,15 +33,27 @@ const Dashboard = () => {
             <p className={styles.cardSubtitle}>Currently in progress</p>
             <div className={styles.filterIcon}>🔍</div>
           </div>
-          <div className={styles.projectBox}>
+
+          {/* Clickable Project Card */}
+          <div
+            className={styles.projectBox}
+            onClick={() => handleProjectClick('alpha')}
+            style={{ cursor: 'pointer' }}
+          >
             <div className={styles.projectHeader}>
               <strong>Project Alpha</strong>
               <span className={styles.statusActive}>ACTIVE</span>
             </div>
             <div className={styles.projectDetails}>
-              <p>Roles Requested: <span className={styles.blueText}>3</span></p>
-              <p>Roles Closed: <span className={styles.greenText}>1</span></p>
-              <p>Lead: <span className={styles.boldText}>John Doe</span></p>
+              <p>
+                Roles Requested: <span className={styles.blueText}>3</span>
+              </p>
+              <p>
+                Roles Closed: <span className={styles.greenText}>1</span>
+              </p>
+              <p>
+                Lead: <span className={styles.boldText}>John Doe</span>
+              </p>
             </div>
           </div>
         </div>

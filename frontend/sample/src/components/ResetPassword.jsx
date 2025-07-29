@@ -25,7 +25,7 @@ const ResetPassword = () => {
 
       if (res.ok) {
         toast.success('✅ Password has been reset!');
-        setTimeout(() => navigate('/'), 1500); // Slight delay for user to see toast
+        setTimeout(() => navigate('/'), 1000);
       } else {
         toast.error(data.message || '❌ Invalid or expired reset code');
       }

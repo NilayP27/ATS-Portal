@@ -25,7 +25,10 @@ const LoginForm = () => {
 
       if (response.ok) {
         toast.success('✅ Login successful!');
-        navigate('/dashboard');
+setTimeout(() => {
+  navigate('/dashboard');
+}, 1000); // Delay navigation by 1.5 seconds
+
       } else {
         toast.error(`❌ ${data.message}`);
       }
@@ -78,8 +81,6 @@ const LoginForm = () => {
           Don't have an account? <strong>Sign Up</strong>
         </p> */}
       </div>
-
-      {/* Toast notifications container */}
       <ToastContainer position="top-center" autoClose={3000} />
     </div>
   );

@@ -1,0 +1,74 @@
+.page-container {
+  background-color: #f9fbff;
+  min-height: 100vh;
+  padding: 2rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.back-arrow {
+  font-size: 1.5rem;
+  margin-right: 1rem;
+  color: #4a54f1;
+  cursor: pointer;
+}
+
+.title {
+  color: #4a54f1;
+  margin: 0;
+}
+
+.subtitle {
+  color: #555;
+  font-size: 0.95rem;
+  margin-top: 0.25rem;
+}
+
+.card {
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+  max-width: 800px;
+  margin: auto;
+}
+
+.card-title {
+  font-size: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.candidate-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f7faff;
+  border-radius: 10px;
+  padding: 1rem 1.5rem;
+  margin-bottom: 1rem;
+  transition: background 0.2s ease-in-out;
+}
+
+.candidate-card:hover {
+  background-color: #eef4ff;
+}
+
+.candidate-info p {
+  margin: 4px 0 0 0;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.stage-badge {
+  background-color: #dce6ff;
+  color: #3c5ad9;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.85rem;
+}

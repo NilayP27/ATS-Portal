@@ -124,3 +124,7 @@
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   /* font-family: system-ui, Avenir, Helvetica, Arial, sans-serif; */
 }
+.projectBox:hover {
+  background-color: #f0f0f0;
+  transition: background-color 0.2s ease;
+}

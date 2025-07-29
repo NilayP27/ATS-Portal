@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './CreateProject.module.css';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack'; // Using MUI for the back arrow icon
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 const CreateProjectForm = () => {
   const [roles, setRoles] = useState([{}]);
@@ -13,7 +13,6 @@ const CreateProjectForm = () => {
 
   return (
     <div className={styles.container}>
-      {/* Back Arrow */}
       <div className={styles.backButtonContainer} onClick={() => navigate(-1)}>
         <ArrowBackIcon className={styles.backIcon} />
         <span className={styles.backText}>Back</span>
