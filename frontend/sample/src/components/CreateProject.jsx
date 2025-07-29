@@ -46,12 +46,22 @@ const CreateProjectForm = () => {
               <select className={styles.currencySelect}>
                 <option value="USD">USD</option>
                 <option value="INR">INR</option>
+                <option value="MYR">MYR</option>
+                <option value="AED">AED</option>
+                <option value="CAD">CAD</option>
+                
               </select>
             </div>
             <input type="date" className={styles.input} placeholder="Deadline" />
             <input type="date" className={styles.input} placeholder="Start Date" />
             <input type="date" className={styles.input} placeholder="End Date" />
-            <input type="file" className={styles.inputFile} />
+            <div className={styles.fileInputContainer}>
+  <label htmlFor={`jobDescFile-${index}`} className={styles.fileLabel}>
+    Upload the file for Job Description
+  </label>
+  <input type="file" id={`jobDescFile-${index}`} className={styles.inputFile} />
+</div>
+
           </div>
         </div>
       ))}

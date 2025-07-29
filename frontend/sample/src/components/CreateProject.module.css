@@ -107,3 +107,13 @@ h2 {
   font-size: 16px;
   font-weight: 500;
 }
+.fileInputContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.fileLabel {
+  font-size: 0.85rem;
+  color: #555;
+}
