@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom'; // 👈 Import useNavigate
+import { useNavigate } from 'react-router-dom';
 import './CandidateList.css';
 
 const candidates = [
@@ -14,7 +14,12 @@ const candidates = [
 ];
 
 const CandidateList = () => {
-  const navigate = useNavigate(); // 👈 Initialize navigate function
+  const navigate = useNavigate();
+
+  const handleCandidateClick = (name) => {
+    const encodedName = encodeURIComponent(name); // handle spaces
+    navigate(`/candidate-feedback/${encodedName}`);
+  };
 
   return (
     <div className="page-container">
@@ -31,7 +36,12 @@ const CandidateList = () => {
       <div className="card">
         <h2 className="card-title">Candidates</h2>
         {candidates.map((candidate, index) => (
-          <div key={index} className="candidate-card">
+          <div
+            key={index}
+            className="candidate-card"
+            onClick={() => handleCandidateClick(candidate.name)}
+            style={{ cursor: 'pointer' }} // 👈 makes it obvious it's clickable
+          >
             <div className="candidate-info">
               <strong>{candidate.name}</strong>
               <p>Current Stage: {candidate.stage}</p>
