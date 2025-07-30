@@ -23,7 +23,7 @@ function App() {
         <Route path="/create-project" element={<CreateProject />} />
         <Route path="/project-review/:projectId" element={<ProjectOverview />} />
         <Route path="/candidates/:jobTitle" element={<CandidateList />} />
-        <Route path="/candidate-feedback/:name" element={<InterviewFeedback />} /> {/* ✅ New dynamic route */}
+        <Route path="/candidate-feedback/:name" element={<InterviewFeedback />} />
       </Routes>
     </Router>
   );

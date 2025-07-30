@@ -17,7 +17,7 @@ const CandidateList = () => {
   const navigate = useNavigate();
 
   const handleCandidateClick = (name) => {
-    const encodedName = encodeURIComponent(name); // handle spaces
+    const encodedName = encodeURIComponent(name);
     navigate(`/candidate-feedback/${encodedName}`);
   };
 
@@ -40,7 +40,7 @@ const CandidateList = () => {
             key={index}
             className="candidate-card"
             onClick={() => handleCandidateClick(candidate.name)}
-            style={{ cursor: 'pointer' }} // 👈 makes it obvious it's clickable
+            style={{ cursor: 'pointer' }}
           >
             <div className="candidate-info">
               <strong>{candidate.name}</strong>
