@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import styles from './CreateProject.module.css';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import axios from 'axios';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const CreateProjectForm = () => {
   const [clientName, setClientName] = useState('');
@@ -10,6 +12,8 @@ const CreateProjectForm = () => {
   const [location, setLocation] = useState('');
   const [type, setType] = useState('Staffing');
   const [startDate, setStartDate] = useState('');
+  const [lead, setLead] = useState(''); // 🔹 New
+  const [status, setStatus] = useState('ACTIVE'); // 🔹 New
   const [roles, setRoles] = useState([
     {
       title: '',
@@ -56,35 +60,36 @@ const CreateProjectForm = () => {
   const handleSubmit = async () => {
     const formData = new FormData();
 
-    // Append files
     roles.forEach((role) => {
       if (role.file) {
         formData.append('jobDescFiles', role.file);
       }
     });
 
-    // Create project data without the actual File objects
     const projectData = {
       clientName,
       projectName,
       location,
       type,
       startDate,
+      lead, // 🔹 Included in data
+      status, // 🔹 Included in data
       roles: roles.map(({ file, ...rest }) => rest),
     };
 
-    // Append structured data
     formData.append('data', JSON.stringify(projectData));
 
     try {
       await axios.post('http://localhost:5000/api/projects', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
-      alert('Project created successfully!');
-      navigate('/dashboard');
+      toast.success('✅ Project created successfully!');
+      setTimeout(() => {
+        navigate('/dashboard');
+      }, 1500);
     } catch (error) {
       console.error('Error creating project:', error);
-      alert('Failed to create project');
+      toast.error('❌ Failed to create project. Please try again.');
     }
   };
 
@@ -130,6 +135,26 @@ const CreateProjectForm = () => {
           value={startDate}
           onChange={(e) => setStartDate(e.target.value)}
         />
+
+        {/* 🔹 New Input: Lead */}
+        <input
+          type="text"
+          placeholder="Enter lead name"
+          className={styles.input}
+          value={lead}
+          onChange={(e) => setLead(e.target.value)}
+        />
+
+        {/* 🔹 New Dropdown: Status */}
+        <select
+          className={styles.input}
+          value={status}
+          onChange={(e) => setStatus(e.target.value)}
+        >
+          <option value="ACTIVE">Active</option>
+          <option value="HOLD">Hold</option>
+          <option value="COMPLETED">Completed</option>
+        </select>
       </div>
 
       <h3>Roles Required</h3>
@@ -212,6 +237,19 @@ const CreateProjectForm = () => {
       <button className={styles.createProjectButton} onClick={handleSubmit}>
         Create Project
       </button>
+
+      {/* Toast container */}
+      <ToastContainer
+        position="top-center"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
     </div>
   );
 };

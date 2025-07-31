@@ -1,9 +1,25 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styles from './Dashboard.module.css';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const [projects, setProjects] = useState([]);
+
+  // Fetch projects from backend
+  const fetchProjects = async () => {
+    try {
+      const res = await axios.get('http://localhost:5000/api/projects');
+      setProjects(res.data);
+    } catch (err) {
+      console.error('Error fetching projects:', err);
+    }
+  };
+
+  useEffect(() => {
+    fetchProjects();
+  }, []);
 
   const handleCreateProject = () => {
     navigate('/create-project');
@@ -12,6 +28,52 @@ const Dashboard = () => {
   const handleProjectClick = (projectId) => {
     navigate(`/project-review/${projectId}`);
   };
+
+  // Function to render project cards based on status
+  const renderProjectsByStatus = (status) =>
+    projects
+      .filter((project) => project.status === status)
+      .map((project) => {
+        const rolesRequested = project.roles?.length || 0;
+        const rolesClosed = project.roles?.filter(role => role.status === 'CLOSED')?.length || 0;
+
+        return (
+          <div
+            key={project._id}
+            className={styles.projectBox}
+            onClick={() => handleProjectClick(project._id)}
+            style={{ cursor: 'pointer' }}
+          >
+            <div className={styles.projectHeader}>
+              <strong>{project.name}</strong>
+              <span
+                className={
+                  project.status === 'ACTIVE'
+                    ? styles.statusActive
+                    : project.status === 'HOLD'
+                    ? styles.statusHold
+                    : styles.statusCompleted
+                }
+              >
+                {project.status}
+              </span>
+            </div>
+            <div className={styles.projectDetails}>
+              <p>
+                Roles Requested:{' '}
+                <span className={styles.blueText}>{rolesRequested}</span>
+              </p>
+              <p>
+                Roles Closed:{' '}
+                <span className={styles.greenText}>{rolesClosed}</span>
+              </p>
+              <p>
+                Lead: <span className={styles.boldText}>{project.lead || 'N/A'}</span>
+              </p>
+            </div>
+          </div>
+        );
+      });
 
   return (
     <div className={styles.container}>
@@ -33,48 +95,21 @@ const Dashboard = () => {
             <p className={styles.cardSubtitle}>Currently in progress</p>
             <div className={styles.filterIcon}>🔍</div>
           </div>
-
-          {/* Clickable Project Card */}
-          <div
-            className={styles.projectBox}
-            onClick={() => handleProjectClick('alpha')}
-            style={{ cursor: 'pointer' }}
-          >
-            <div className={styles.projectHeader}>
-              <strong>Project Alpha</strong>
-              <span className={styles.statusActive}>ACTIVE</span>
-            </div>
-            <div className={styles.projectDetails}>
-              <p>
-                Roles Requested: <span className={styles.blueText}>3</span>
-              </p>
-              <p>
-                Roles Closed: <span className={styles.greenText}>1</span>
-              </p>
-              <p>
-                Lead: <span className={styles.boldText}>John Doe</span>
-              </p>
-            </div>
-          </div>
+          {renderProjectsByStatus('ACTIVE')}
         </div>
 
         {/* Projects on Hold */}
         <div className={styles.card}>
           <h3>Projects on Hold</h3>
           <p className={styles.cardSubtitle}>Temporarily paused</p>
-          <div className={styles.warningBox}>
-            <strong>Projects go to hold when:</strong>
-            <ul>
-              <li>Not updated in 3 months after deadline</li>
-              <li>Manually set to hold status</li>
-            </ul>
-          </div>
+          {renderProjectsByStatus('HOLD')}
         </div>
 
         {/* Completed Projects */}
         <div className={styles.card}>
           <h3>Completed Projects</h3>
           <p className={styles.cardSubtitle}>Successfully finished</p>
+          {renderProjectsByStatus('COMPLETED')}
         </div>
       </div>
     </div>
