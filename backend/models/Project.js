@@ -8,7 +8,7 @@ const roleSchema = new mongoose.Schema({
   deadline: { type: String, required: true },
   startDate: { type: String, required: true },
   endDate: { type: String, required: true },
-  jobDescFilePath: { type: String }, // path to uploaded file (optional)
+  jobDescFilePath: { type: String },
 });
 
 const projectSchema = new mongoose.Schema({
@@ -17,9 +17,18 @@ const projectSchema = new mongoose.Schema({
   location: { type: String, required: true },
   type: { type: String, enum: ['Staffing', 'Consulting'], default: 'Staffing' },
   startDate: { type: String, required: true },
+  status: {
+    type: String,
+    enum: ['ACTIVE', 'HOLD', 'COMPLETED'],
+    default: 'ACTIVE',
+  },
+  lead: {
+    type: String,
+    required: true,
+  },
   roles: [roleSchema],
 }, {
-  timestamps: true, // Adds createdAt and updatedAt
+  timestamps: true,
 });
 
 module.exports = mongoose.model('Project', projectSchema);

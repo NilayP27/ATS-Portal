@@ -50,8 +50,14 @@ router.post('/', upload.array('jobDescFiles'), async (req, res) => {
   }
 });
 router.get('/', async (req, res) => {
-  const projects = await Project.find();
-  res.json(projects);
+  try {
+    const projects = await Project.find();
+    res.json(projects);
+  } catch (error) {
+    console.error('Error fetching projects:', error);
+    res.status(500).json({ error: 'Failed to fetch projects' });
+  }
 });
+
 
 module.exports = router;
