@@ -72,8 +72,8 @@ const CreateProjectForm = () => {
       location,
       type,
       startDate,
-      lead, // 🔹 Included in data
-      status, // 🔹 Included in data
+      lead,
+      status, 
       roles: roles.map(({ file, ...rest }) => rest),
     };
 
@@ -136,7 +136,6 @@ const CreateProjectForm = () => {
           onChange={(e) => setStartDate(e.target.value)}
         />
 
-        {/* 🔹 New Input: Lead */}
         <input
           type="text"
           placeholder="Enter lead name"
@@ -145,7 +144,6 @@ const CreateProjectForm = () => {
           onChange={(e) => setLead(e.target.value)}
         />
 
-        {/* 🔹 New Dropdown: Status */}
         <select
           className={styles.input}
           value={status}
@@ -238,7 +236,6 @@ const CreateProjectForm = () => {
         Create Project
       </button>
 
-      {/* Toast container */}
       <ToastContainer
         position="top-center"
         autoClose={3000}
