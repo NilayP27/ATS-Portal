@@ -1,4 +1,3 @@
-// models/Candidate.js
 const mongoose = require('mongoose');
 
 const candidateSchema = new mongoose.Schema({
@@ -10,6 +9,10 @@ const candidateSchema = new mongoose.Schema({
   roleId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'OpenRole',
+    required: true,
+  },
+  roleTitle: {
+    type: String,
     required: true,
   },
   name: String,
@@ -29,7 +32,7 @@ const candidateSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now,
-  },
+  }
 });
 
 module.exports = mongoose.model('Candidate', candidateSchema);

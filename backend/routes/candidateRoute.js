@@ -4,7 +4,7 @@ const Candidate = require('../models/Candidate');
 
 const router = express.Router();
 
-
+// ➤ Create a new candidate
 router.post('/', async (req, res) => {
   try {
     const candidate = new Candidate(req.body);
@@ -16,20 +16,20 @@ router.post('/', async (req, res) => {
   }
 });
 
-
+// ➤ Get interview stats & role-wise stats for a project
 router.get('/:projectId/overview', async (req, res) => {
   const { projectId } = req.params;
 
   try {
-    
+    // Interview level-wise stats (L0/L1/L2)
     const interviewStats = await Candidate.aggregate([
       { $match: { projectId: new mongoose.Types.ObjectId(projectId) } },
       {
         $group: {
           _id: { level: '$interviewLevel', status: '$interviewStatus' },
-          count: { $sum: 1 }
-        }
-      }
+          count: { $sum: 1 },
+        },
+      },
     ]);
 
     const formattedStats = {};
@@ -42,7 +42,7 @@ router.get('/:projectId/overview', async (req, res) => {
       formattedStats[level][status.toLowerCase()] = item.count;
     }
 
-    
+    // Role-wise candidate stats
     const roleStats = await Candidate.aggregate([
       { $match: { projectId: new mongoose.Types.ObjectId(projectId) } },
       {
@@ -50,17 +50,13 @@ router.get('/:projectId/overview', async (req, res) => {
           _id: '$roleTitle',
           total: { $sum: 1 },
           selected: {
-            $sum: {
-              $cond: [{ $eq: ['$interviewStatus', 'PASSED'] }, 1, 0]
-            }
+            $sum: { $cond: [{ $eq: ['$interviewStatus', 'PASSED'] }, 1, 0] },
           },
           rejected: {
-            $sum: {
-              $cond: [{ $eq: ['$interviewStatus', 'REJECTED'] }, 1, 0]
-            }
-          }
-        }
-      }
+            $sum: { $cond: [{ $eq: ['$interviewStatus', 'REJECTED'] }, 1, 0] },
+          },
+        },
+      },
     ]);
 
     res.json({
@@ -69,8 +65,8 @@ router.get('/:projectId/overview', async (req, res) => {
         title: r._id,
         total: r.total,
         selected: r.selected,
-        rejected: r.rejected
-      }))
+        rejected: r.rejected,
+      })),
     });
   } catch (err) {
     console.error('Error fetching project overview:', err);
@@ -78,7 +74,7 @@ router.get('/:projectId/overview', async (req, res) => {
   }
 });
 
-
+// ➤ Get all candidates for a specific project
 router.get('/:projectId', async (req, res) => {
   try {
     const candidates = await Candidate.find({ projectId: req.params.projectId });
@@ -88,5 +84,33 @@ router.get('/:projectId', async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch candidates' });
   }
 });
+
+// ➤ NEW: Get candidates by role title
+router.get('/by-role', async (req, res) => {
+  const { roleTitle } = req.query;
+
+  if (!roleTitle) {
+    return res.status(400).json({ error: 'Missing roleTitle in query' });
+  }
+
+  try {
+    const candidates = await Candidate.find({ roleTitle });
+    res.json(candidates);
+  } catch (err) {
+    console.error('Error fetching candidates by role:', err);
+    res.status(500).json({ error: 'Failed to fetch candidates by role' });
+  }
+});
+router.get('/by-role/:roleTitle', async (req, res) => {
+  const { roleTitle } = req.params;
+  try {
+    const candidates = await Candidate.find({ roleTitle });
+    res.json(candidates);
+  } catch (error) {
+    console.error('Error fetching candidates by role:', error);
+    res.status(500).json({ error: 'Failed to fetch candidates' });
+  }
+});
+
 
 module.exports = router;
