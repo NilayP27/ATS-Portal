@@ -4,7 +4,7 @@ const Candidate = require('../models/Candidate');
 
 const router = express.Router();
 
-// POST /api/candidates - Add a new candidate
+
 router.post('/', async (req, res) => {
   try {
     const candidate = new Candidate(req.body);
@@ -16,12 +16,12 @@ router.post('/', async (req, res) => {
   }
 });
 
-// GET /api/candidates/:projectId/overview - Get project-level candidate stats
+
 router.get('/:projectId/overview', async (req, res) => {
   const { projectId } = req.params;
 
   try {
-    // Interview-level stats
+    
     const interviewStats = await Candidate.aggregate([
       { $match: { projectId: new mongoose.Types.ObjectId(projectId) } },
       {
@@ -42,7 +42,7 @@ router.get('/:projectId/overview', async (req, res) => {
       formattedStats[level][status.toLowerCase()] = item.count;
     }
 
-    // Role-based stats
+    
     const roleStats = await Candidate.aggregate([
       { $match: { projectId: new mongoose.Types.ObjectId(projectId) } },
       {
@@ -78,7 +78,7 @@ router.get('/:projectId/overview', async (req, res) => {
   }
 });
 
-// GET /api/candidates/:projectId - Get all candidates for a project
+
 router.get('/:projectId', async (req, res) => {
   try {
     const candidates = await Candidate.find({ projectId: req.params.projectId });
