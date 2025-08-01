@@ -6,7 +6,6 @@ require("dotenv").config();
 const authRoutes = require("./routes/auth");
 const projectRoutes = require("./routes/projectRoute");
 const candidateRoutes = require("./routes/candidateRoute");
-const openRolesRoutes=require("./routes/openRole")
 
 const app = express();
 
@@ -25,7 +24,6 @@ mongoose.connect(process.env.MONGO_URI, {
 app.use("/api/auth", authRoutes);
 app.use("/api/projects", projectRoutes); 
 app.use("/api/candidates", candidateRoutes);
-app.use("/api/open-roles", openRolesRoutes)
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

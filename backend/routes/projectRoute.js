@@ -58,6 +58,19 @@ router.get('/', async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch projects' });
   }
 });
+// GET /api/projects/:projectId - Fetch a specific project including its roles
+router.get('/:projectId', async (req, res) => {
+  try {
+    const project = await Project.findById(req.params.projectId);
+    if (!project) {
+      return res.status(404).json({ error: 'Project not found' });
+    }
+    res.json(project);
+  } catch (error) {
+    console.error('Error fetching project:', error);
+    res.status(500).json({ error: 'Failed to fetch project' });
+  }
+});
 
 
 module.exports = router;
