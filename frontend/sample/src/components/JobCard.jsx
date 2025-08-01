@@ -25,7 +25,7 @@ const JobCard = ({
 
     <div className={styles.meta}>
       <p>📍 {location}</p>
-      <p>💲 {salary} USD</p>
+      <p>💲 {salary}</p>
       <p>📅 Deadline: {deadline}</p>
     </div>
 

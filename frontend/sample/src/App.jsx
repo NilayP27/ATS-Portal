@@ -30,10 +30,12 @@ function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/create-project" element={<CreateProject />} />
         <Route path="/project-review/:projectId" element={<ProjectOverview />} />
+        
 
         {/* Candidate Routes */}
-        <Route path="/candidates/:roleTitle" element={<CandidateList />} />
+        <Route path="/candidates/:projectId/:roleTitle" element={<CandidateList />} />
         <Route path="/candidate-feedback/:name" element={<InterviewFeedback />} />
+        
       </Routes>
     </Router>
   );

@@ -15,7 +15,7 @@ const ProjectOverview = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // 1. Fetch candidate stats (interview summary)
+        // 1. Fetch candidate stats
         const candidateRes = await axios.get(
           `http://localhost:5000/api/candidates/${projectId}/overview`
         );
@@ -35,13 +35,28 @@ const ProjectOverview = () => {
     fetchData();
   }, [projectId]);
 
-  const handleViewCandidates = (jobTitle) => {
-    navigate(`/candidates/${encodeURIComponent(jobTitle)}`);
+  const handleViewCandidates = (roleTitle) => {
+    navigate(`/candidates/${projectId}/${encodeURIComponent(roleTitle)}`);
   };
 
   return (
     <div style={{ padding: "2rem", display: "grid", gap: "2rem" }}>
-      <h2>Interview Dashboard</h2>
+      {/* Interview Dashboard Title with Back Arrow */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          color: "#1f2937", // Match the Interview Dashboard color (adjust as needed)
+          cursor: "pointer",
+        }}
+        onClick={() => navigate("/dashboard")}
+      >
+        <span style={{ marginRight: "0.75rem", fontSize: "1.5rem" }}>
+          &#8592;
+        </span>
+        <h2 style={{ margin: 0 }}>Interview Dashboard</h2>
+      </div>
+
       <div style={{ display: "flex", gap: "1rem" }}>
         {["L0", "L1", "L2"].map((level) => {
           const stats = interviewStats[level] || {

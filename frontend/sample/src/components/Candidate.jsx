@@ -5,13 +5,15 @@ import axios from 'axios';
 
 const CandidateList = () => {
   const navigate = useNavigate();
-  const { roleTitle } = useParams();
+  const { roleTitle, projectId } = useParams();
   const [candidates, setCandidates] = useState([]);
 
   useEffect(() => {
     const fetchCandidates = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/api/candidates/by-role/${encodeURIComponent(roleTitle)}`);
+        const res = await axios.get(
+          `http://localhost:5000/api/candidates/by-project-role/${projectId}/${encodeURIComponent(roleTitle)}`
+        );
         setCandidates(res.data || []);
       } catch (error) {
         console.error('Error fetching candidates:', error);
@@ -19,7 +21,7 @@ const CandidateList = () => {
     };
 
     fetchCandidates();
-  }, [roleTitle]);
+  }, [roleTitle, projectId]);
 
   const handleCandidateClick = (name) => {
     const encodedName = encodeURIComponent(name);
@@ -29,7 +31,7 @@ const CandidateList = () => {
   return (
     <div className="page-container">
       <div className="header">
-        <span className="back-arrow" onClick={() => navigate('/dashboard')}>
+        <span className="back-arrow" onClick={() => navigate(`/project-review/${projectId}`)}>
           &#8592;
         </span>
         <div>
