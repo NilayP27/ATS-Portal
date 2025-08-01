@@ -9,20 +9,30 @@ const ProjectOverview = () => {
   const { projectId } = useParams();
 
   const [interviewStats, setInterviewStats] = useState({});
-  const [roles, setRoles] = useState([]);
+  const [roleStats, setRoleStats] = useState([]);
+  const [openRoles, setOpenRoles] = useState([]);
 
   useEffect(() => {
-    const fetchOverview = async () => {
+    const fetchData = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/api/candidates/${projectId}/overview`);
-        setInterviewStats(res.data.interviewStats || {});
-        setRoles(res.data.roles || []);
+        // Get candidate stats (for interview dashboard & role-wise summary)
+        const candidateRes = await axios.get(
+          `http://localhost:5000/api/candidates/${projectId}/overview`
+        );
+        setInterviewStats(candidateRes.data.interviewStats || []);
+        setRoleStats(candidateRes.data.roles || []);
+
+        // Get open roles
+        const rolesRes = await axios.get(
+          `http://localhost:5000/api/open-roles/${projectId}`
+        );
+        setOpenRoles(rolesRes.data || []);
       } catch (err) {
-        console.error("Failed to fetch overview:", err);
+        console.error("Failed to fetch project overview:", err);
       }
     };
 
-    fetchOverview();
+    fetchData();
   }, [projectId]);
 
   const handleViewCandidates = (jobTitle) => {
@@ -34,7 +44,11 @@ const ProjectOverview = () => {
       <h2>Interview Dashboard</h2>
       <div style={{ display: "flex", gap: "1rem" }}>
         {["L0", "L1", "L2"].map((level) => {
-          const stats = interviewStats[level] || { passed: 0, pending: 0, rejected: 0 };
+          const stats = interviewStats[level] || {
+            passed: 0,
+            pending: 0,
+            rejected: 0,
+          };
           const total = stats.passed + stats.pending + stats.rejected;
 
           return (
@@ -52,19 +66,27 @@ const ProjectOverview = () => {
 
       <h2>Open Roles</h2>
       <div style={{ display: "flex", gap: "2rem" }}>
-        {roles.map((role) => (
-          <JobCard
-            key={role.title}
-            title={role.title}
-            location={role.location || "N/A"}   
-            salary={role.salary || "N/A"}           
-            deadline={role.deadline || "N/A"}       
-            total={role.total}
-            selected={role.selected}
-            rejected={role.rejected}
-            onView={() => handleViewCandidates(role.title)}
-          />
-        ))}
+        {openRoles.map((role) => {
+          const stats = roleStats.find((r) => r.title === role.title) || {
+            total: 0,
+            selected: 0,
+            rejected: 0,
+          };
+
+          return (
+            <JobCard
+              key={role._id}
+              title={role.title}
+              location={role.location || "N/A"}
+              salary={role.salary || "N/A"}
+              deadline={role.deadline || "N/A"}
+              total={stats.total}
+              selected={stats.selected}
+              rejected={stats.rejected}
+              onView={() => handleViewCandidates(role.title)}
+            />
+          );
+        })}
       </div>
     </div>
   );
