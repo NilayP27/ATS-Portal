@@ -10,23 +10,23 @@ const ProjectOverview = () => {
 
   const [interviewStats, setInterviewStats] = useState({});
   const [roleStats, setRoleStats] = useState([]);
-  const [openRoles, setOpenRoles] = useState([]);
+  const [projectRoles, setProjectRoles] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Get candidate stats (for interview dashboard & role-wise summary)
+        // 1. Fetch candidate stats (interview summary)
         const candidateRes = await axios.get(
           `http://localhost:5000/api/candidates/${projectId}/overview`
         );
-        setInterviewStats(candidateRes.data.interviewStats || []);
+        setInterviewStats(candidateRes.data.interviewStats || {});
         setRoleStats(candidateRes.data.roles || []);
 
-        // Get open roles
-        const rolesRes = await axios.get(
-          `http://localhost:5000/api/open-roles/${projectId}`
+        // 2. Fetch project info including roles
+        const projectRes = await axios.get(
+          `http://localhost:5000/api/projects/${projectId}`
         );
-        setOpenRoles(rolesRes.data || []);
+        setProjectRoles(projectRes.data.roles || []);
       } catch (err) {
         console.error("Failed to fetch project overview:", err);
       }
@@ -65,8 +65,8 @@ const ProjectOverview = () => {
       </div>
 
       <h2>Open Roles</h2>
-      <div style={{ display: "flex", gap: "2rem" }}>
-        {openRoles.map((role) => {
+      <div style={{ display: "flex", gap: "2rem", flexWrap: "wrap" }}>
+        {projectRoles.map((role, idx) => {
           const stats = roleStats.find((r) => r.title === role.title) || {
             total: 0,
             selected: 0,
@@ -75,10 +75,10 @@ const ProjectOverview = () => {
 
           return (
             <JobCard
-              key={role._id}
+              key={`${role.title}-${idx}`}
               title={role.title}
               location={role.location || "N/A"}
-              salary={role.salary || "N/A"}
+              salary={`${role.currency || ""} ${role.salary || "N/A"}`}
               deadline={role.deadline || "N/A"}
               total={stats.total}
               selected={stats.selected}
