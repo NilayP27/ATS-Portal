@@ -1,20 +1,25 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import './CandidateList.css';
-
-const candidates = [
-  {
-    name: 'Alice Johnson',
-    stage: 'L2',
-  },
-  {
-    name: 'Bob Smith',
-    stage: 'L1',
-  },
-];
+import axios from 'axios';
 
 const CandidateList = () => {
   const navigate = useNavigate();
+  const { roleTitle } = useParams();
+  const [candidates, setCandidates] = useState([]);
+
+  useEffect(() => {
+    const fetchCandidates = async () => {
+      try {
+        const res = await axios.get(`http://localhost:5000/api/candidates/by-role/${encodeURIComponent(roleTitle)}`);
+        setCandidates(res.data || []);
+      } catch (error) {
+        console.error('Error fetching candidates:', error);
+      }
+    };
+
+    fetchCandidates();
+  }, [roleTitle]);
 
   const handleCandidateClick = (name) => {
     const encodedName = encodeURIComponent(name);
@@ -28,27 +33,31 @@ const CandidateList = () => {
           &#8592;
         </span>
         <div>
-          <h1 className="title">Frontend Developer</h1>
+          <h1 className="title">{roleTitle}</h1>
           <p className="subtitle">Candidate overview and progress</p>
         </div>
       </div>
 
       <div className="card">
         <h2 className="card-title">Candidates</h2>
-        {candidates.map((candidate, index) => (
-          <div
-            key={index}
-            className="candidate-card"
-            onClick={() => handleCandidateClick(candidate.name)}
-            style={{ cursor: 'pointer' }}
-          >
-            <div className="candidate-info">
-              <strong>{candidate.name}</strong>
-              <p>Current Stage: {candidate.stage}</p>
+        {candidates.length === 0 ? (
+          <p>No candidates available for this role.</p>
+        ) : (
+          candidates.map((candidate, index) => (
+            <div
+              key={index}
+              className="candidate-card"
+              onClick={() => handleCandidateClick(candidate.name)}
+              style={{ cursor: 'pointer' }}
+            >
+              <div className="candidate-info">
+                <strong>{candidate.name}</strong>
+                <p>Current Stage: {candidate.interviewLevel}</p>
+              </div>
+              <div className="stage-badge">{candidate.interviewLevel}</div>
             </div>
-            <div className="stage-badge">{candidate.stage}</div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
     </div>
   );
