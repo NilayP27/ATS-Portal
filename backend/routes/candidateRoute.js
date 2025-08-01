@@ -86,28 +86,18 @@ router.get('/:projectId', async (req, res) => {
 });
 
 // ➤ NEW: Get candidates by role title
-router.get('/by-role', async (req, res) => {
-  const { roleTitle } = req.query;
-
-  if (!roleTitle) {
-    return res.status(400).json({ error: 'Missing roleTitle in query' });
-  }
+// ➤ Get candidates by projectId AND roleTitle
+router.get('/by-project-role/:projectId/:roleTitle', async (req, res) => {
+  const { projectId, roleTitle } = req.params;
 
   try {
-    const candidates = await Candidate.find({ roleTitle });
-    res.json(candidates);
-  } catch (err) {
-    console.error('Error fetching candidates by role:', err);
-    res.status(500).json({ error: 'Failed to fetch candidates by role' });
-  }
-});
-router.get('/by-role/:roleTitle', async (req, res) => {
-  const { roleTitle } = req.params;
-  try {
-    const candidates = await Candidate.find({ roleTitle });
+    const candidates = await Candidate.find({
+      projectId,
+      roleTitle: decodeURIComponent(roleTitle),
+    });
     res.json(candidates);
   } catch (error) {
-    console.error('Error fetching candidates by role:', error);
+    console.error('Error fetching candidates by project and role:', error);
     res.status(500).json({ error: 'Failed to fetch candidates' });
   }
 });
