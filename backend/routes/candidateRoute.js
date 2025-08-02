@@ -101,6 +101,21 @@ router.get('/by-project-role/:projectId/:roleTitle', async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch candidates' });
   }
 });
+router.put('/:id/interview-level', async (req, res) => {
+  const { id } = req.params;
+  const { interviewLevel } = req.body;
 
+  try {
+    const updated = await Candidate.findByIdAndUpdate(
+      id,
+      { interviewLevel },
+      { new: true }
+    );
+    res.json(updated);
+  } catch (err) {
+    console.error('Error updating interview level:', err);
+    res.status(500).json({ error: 'Failed to update interview level' });
+  }
+});
 
 module.exports = router;
