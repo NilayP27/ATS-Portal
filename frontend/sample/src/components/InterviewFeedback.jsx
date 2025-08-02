@@ -17,8 +17,11 @@ const InterviewFeedback = () => {
     try {
       const res = await axios.get(`/api/candidates/by-id/${id}`);
       setCandidate(res.data);
-      // Add isNew = false to each item fetched from DB
-      const withFlags = (res.data.feedback || []).map(fb => ({ ...fb, isNew: false }));
+      const withFlags = (res.data.feedback || []).map(fb => ({
+        ...fb,
+        isNew: false,
+        isEditing: false, // New flag for editing existing
+      }));
       setFeedbackList(withFlags);
     } catch (err) {
       console.error("Error fetching candidate:", err);
@@ -63,10 +66,9 @@ const InterviewFeedback = () => {
       const res = await axios.put(`/api/candidates/${id}/feedback`, item);
       toast.success("Feedback saved!");
 
-      // Replace that index with fresh feedback from server (add isNew: false)
       const savedFb = res.data.feedback.find(fb => fb.level === item.level);
       const updated = [...feedbackList];
-      updated[index] = { ...savedFb, isNew: false };
+      updated[index] = { ...savedFb, isNew: false, isEditing: false };
       setFeedbackList(updated);
     } catch (err) {
       console.error("Failed to save feedback:", err);
@@ -75,15 +77,30 @@ const InterviewFeedback = () => {
   };
 
   const addFeedback = () => {
+    const usedLevels = feedbackList.map(f => f.level).filter(Boolean);
+    const possibleLevels = ["L0", "L1", "L2"];
+    const nextAvailable = possibleLevels.find(lvl => !usedLevels.includes(lvl));
+
+    if (!nextAvailable) {
+      toast.warn("All feedback levels (L0, L1, L2) are already used.");
+      return;
+    }
+
     setFeedbackList([
       ...feedbackList,
-      { level: "", comment: "", status: "PENDING", isNew: true }
+      { level: nextAvailable, comment: "", status: "PENDING", isNew: true, isEditing: true }
     ]);
+  };
+
+  const toggleEdit = (index) => {
+    const updated = [...feedbackList];
+    updated[index].isEditing = true;
+    setFeedbackList(updated);
   };
 
   return (
     <div className="feedback-container">
-      <ToastContainer position="top-right" autoClose={3000} />
+      <ToastContainer position="top-center" autoClose={3000} />
       <div className="candidate-header">
         <span className="back-arrow" onClick={() => navigate(-1)}>←</span>
         <div>
@@ -100,19 +117,18 @@ const InterviewFeedback = () => {
         {feedbackList.map((fb, index) => (
           <div key={index} className="feedback-card editable">
             <div className="feedback-header">
-              {!fb.isNew ? (
+              <span><strong>Interview {fb.level}</strong></span>
+              {!fb.isNew && !fb.isEditing && (
+                <span className={getStatusClass(fb.status)}>{fb.status}</span>
+              )}
+              {!fb.isNew && !fb.isEditing && (
+                <button onClick={() => toggleEdit(index)}>✏️ Edit</button>
+              )}
+            </div>
+
+            <div className="feedback-body">
+              {fb.isNew || fb.isEditing ? (
                 <>
-                  <span><strong>Interview {fb.level}</strong></span>
-                  <span className={getStatusClass(fb.status)}>{fb.status}</span>
-                </>
-              ) : (
-                <>
-                  <input
-                    type="text"
-                    placeholder="Level (e.g., L0)"
-                    value={fb.level}
-                    onChange={(e) => handleInputChange(index, "level", e.target.value)}
-                  />
                   <select
                     value={fb.status}
                     onChange={(e) => handleInputChange(index, "status", e.target.value)}
@@ -121,26 +137,18 @@ const InterviewFeedback = () => {
                     <option value="REJECTED">REJECTED</option>
                     <option value="PENDING">PENDING</option>
                   </select>
+                  <textarea
+                    value={fb.comment}
+                    onChange={(e) => handleInputChange(index, "comment", e.target.value)}
+                    placeholder="Enter feedback comment"
+                    rows={3}
+                  />
+                  <button onClick={() => handleSave(index)}>💾 Save</button>
                 </>
-              )}
-            </div>
-
-            <div className="feedback-body">
-              {!fb.isNew ? (
-                fb.comment.trim() || "No feedback provided yet"
               ) : (
-                <textarea
-                  value={fb.comment}
-                  onChange={(e) => handleInputChange(index, "comment", e.target.value)}
-                  placeholder="Enter feedback comment"
-                  rows={3}
-                />
+                fb.comment?.trim() || "No feedback provided yet"
               )}
             </div>
-
-            {fb.isNew && (
-              <button onClick={() => handleSave(index)}>💾 Save</button>
-            )}
           </div>
         ))}
 
