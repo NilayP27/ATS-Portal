@@ -23,9 +23,25 @@ const CandidateList = () => {
     fetchCandidates();
   }, [roleTitle, projectId]);
 
-  const handleCandidateClick = (name) => {
-    const encodedName = encodeURIComponent(name);
-    navigate(`/candidate-feedback/${encodedName}`);
+  const handleCandidateClick = (candidateId) => {
+    navigate(`/candidate-feedback/${candidateId}`);
+  };
+
+  const handleLevelChange = async (candidateId, newLevel) => {
+    try {
+      await axios.put(`http://localhost:5000/api/candidates/${candidateId}/interview-level`, {
+        interviewLevel: newLevel,
+      });
+
+      // Update UI locally
+      setCandidates((prev) =>
+        prev.map((c) =>
+          c._id === candidateId ? { ...c, interviewLevel: newLevel } : c
+        )
+      );
+    } catch (err) {
+      console.error('Error updating interview level:', err);
+    }
   };
 
   return (
@@ -45,18 +61,29 @@ const CandidateList = () => {
         {candidates.length === 0 ? (
           <p>No candidates available for this role.</p>
         ) : (
-          candidates.map((candidate, index) => (
+          candidates.map((candidate) => (
             <div
-              key={index}
+              key={candidate._id}
               className="candidate-card"
-              onClick={() => handleCandidateClick(candidate.name)}
-              style={{ cursor: 'pointer' }}
+              style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
             >
-              <div className="candidate-info">
+              <div
+                onClick={() => handleCandidateClick(candidate._id)}
+                style={{ cursor: 'pointer' }}
+              >
                 <strong>{candidate.name}</strong>
                 <p>Current Stage: {candidate.interviewLevel}</p>
               </div>
-              <div className="stage-badge">{candidate.interviewLevel}</div>
+
+              <select
+                value={candidate.interviewLevel}
+                onChange={(e) => handleLevelChange(candidate._id, e.target.value)}
+                style={{ padding: '6px 12px', borderRadius: '6px' }}
+              >
+                <option value="L0">L0</option>
+                <option value="L1">L1</option>
+                <option value="L2">L2</option>
+              </select>
             </div>
           ))
         )}
