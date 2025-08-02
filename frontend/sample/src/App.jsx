@@ -34,7 +34,8 @@ function App() {
 
         {/* Candidate Routes */}
         <Route path="/candidates/:projectId/:roleTitle" element={<CandidateList />} />
-        <Route path="/candidate-feedback/:name" element={<InterviewFeedback />} />
+        <Route path="/candidate-feedback/:id" element={<InterviewFeedback />} />
+
         
       </Routes>
     </Router>

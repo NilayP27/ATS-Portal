@@ -74,3 +74,131 @@
   color: #333;
   font-size: 14px;
 }
+.feedback-card.editable {
+  background-color: #fff;
+  border: 1px solid #ccc;
+}
+
+.feedback-card input,
+.feedback-card select,
+.feedback-card textarea {
+  width: 100%;
+  margin-top: 0.3rem;
+  padding: 0.5rem;
+  border-radius: 4px;
+  border: 1px solid #aaa;
+  font-size: 0.9rem;
+}
+
+.feedback-card button {
+  margin-top: 0.5rem;
+  padding: 0.4rem 0.8rem;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.feedback-section > button {
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 4px;
+}
+.feedback-card.editable {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.feedback-card.editable .feedback-header {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.feedback-card.editable input,
+.feedback-card.editable select,
+.feedback-card.editable textarea {
+  font-family: 'Segoe UI', sans-serif;
+  font-size: 14px;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background-color: #fdfdfd;
+  transition: border-color 0.2s;
+  width: 100%;
+}
+
+.feedback-card.editable input:focus,
+.feedback-card.editable select:focus,
+.feedback-card.editable textarea:focus {
+  outline: none;
+  border-color: #3f51b5;
+}
+
+.feedback-card.editable textarea {
+  resize: vertical;
+  min-height: 80px;
+  margin-top: 8px;
+}
+
+.feedback-card.editable button {
+  margin-top: 12px;
+  padding: 8px 16px;
+  background-color: #3f51b5;
+  color: #fff;
+  font-weight: 500;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.feedback-card.editable button:hover {
+  background-color: #3242a8;
+}
+
+.feedback-section > button {
+  margin-top: 16px;
+  padding: 10px 20px;
+  background-color: #198754;
+  color: #fff;
+  font-weight: 500;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.feedback-section > button:hover {
+  background-color: #146c43;
+}
+.status {
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.status.passed {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.status.rejected {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.status.pending {
+  background-color: #fff3cd; /* Yellow background */
+  color: #856404;           /* Dark yellow text */
+}
