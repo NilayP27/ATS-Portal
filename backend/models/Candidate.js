@@ -1,5 +1,22 @@
 const mongoose = require('mongoose');
 
+const feedbackSchema = new mongoose.Schema({
+  level: {
+    type: String,
+    enum: ['L0', 'L1', 'L2'],
+    required: true,
+  },
+  comment: {
+    type: String,
+    required: true,
+  },
+  status: {
+    type: String,
+    enum: ['PENDING', 'PASSED', 'REJECTED'],
+    default: 'PENDING',
+  },
+}, { _id: false }); // prevents automatic _id generation for subdocs
+
 const candidateSchema = new mongoose.Schema({
   projectId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -29,6 +46,7 @@ const candidateSchema = new mongoose.Schema({
     enum: ['PENDING', 'PASSED', 'REJECTED'],
     default: 'PENDING',
   },
+  feedback: [feedbackSchema], // ⬅️ Add this line
   createdAt: {
     type: Date,
     default: Date.now,
