@@ -117,3 +117,13 @@ h2 {
   font-size: 0.85rem;
   color: #555;
 }
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+}
+
+.label {
+  font-size: 14px;
+  margin-bottom: 4px;
+  color: #333;
+}

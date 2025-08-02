@@ -74,7 +74,12 @@ const CreateProjectForm = () => {
       startDate,
       lead,
       status, 
-      roles: roles.map(({ file, ...rest }) => rest),
+      roles: roles.map(role => {
+  const roleCopy = { ...role };
+  delete roleCopy.file;
+  return roleCopy;
+}),
+
     };
 
     formData.append('data', JSON.stringify(projectData));
@@ -129,12 +134,16 @@ const CreateProjectForm = () => {
           <option value="Staffing">Staffing</option>
           <option value="Consulting">Project</option>
         </select>
-        <input
-          type="date"
-          className={styles.input}
-          value={startDate}
-          onChange={(e) => setStartDate(e.target.value)}
-        />
+        <div className={styles.inputGroup}>
+  <label className={styles.label}>Requisition Date</label>
+  <input
+    type="date"
+    className={styles.input}
+    value={startDate}
+    onChange={(e) => setStartDate(e.target.value)}
+  />
+</div>
+
 
         <input
           type="text"
@@ -196,24 +205,34 @@ const CreateProjectForm = () => {
                 <option value="CAD">CAD</option>
               </select>
             </div>
-            <input
-              type="date"
-              className={styles.input}
-              value={role.deadline}
-              onChange={(e) => handleRoleChange(index, 'deadline', e.target.value)}
-            />
-            <input
-              type="date"
-              className={styles.input}
-              value={role.startDate}
-              onChange={(e) => handleRoleChange(index, 'startDate', e.target.value)}
-            />
-            <input
-              type="date"
-              className={styles.input}
-              value={role.endDate}
-              onChange={(e) => handleRoleChange(index, 'endDate', e.target.value)}
-            />
+            <div className={styles.inputGroup}>
+  <label className={styles.label}>Deadline</label>
+  <input
+    type="date"
+    className={styles.input}
+    value={role.deadline}
+    onChange={(e) => handleRoleChange(index, 'deadline', e.target.value)}
+  />
+</div>
+<div className={styles.inputGroup}>
+  <label className={styles.label}>Start Date</label>
+  <input
+    type="date"
+    className={styles.input}
+    value={role.startDate}
+    onChange={(e) => handleRoleChange(index, 'startDate', e.target.value)}
+  />
+</div>
+<div className={styles.inputGroup}>
+  <label className={styles.label}>End Date</label>
+  <input
+    type="date"
+    className={styles.input}
+    value={role.endDate}
+    onChange={(e) => handleRoleChange(index, 'endDate', e.target.value)}
+  />
+</div>
+
             <div className={styles.fileInputContainer}>
               <label htmlFor={`jobDescFile-${index}`} className={styles.fileLabel}>
                 Upload the file for Job Description
