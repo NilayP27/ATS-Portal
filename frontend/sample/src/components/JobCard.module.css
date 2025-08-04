@@ -31,12 +31,21 @@
   margin-top: 0.5rem;
 }
 
-.icon {
+.map {
   margin-right: 6px;
-  color: #444;
+  color: blue;
   vertical-align: middle;
 }
-
+.dollar {
+  margin-right: 6px;
+  color: green;
+  vertical-align: middle;
+}
+.calendar {
+  margin-right: 6px;
+  color: red;
+  vertical-align: middle;
+}
 .eyeIcon {
   color: #007bff;
   transition: transform 0.2s ease;

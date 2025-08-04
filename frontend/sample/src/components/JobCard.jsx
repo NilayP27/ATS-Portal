@@ -25,9 +25,9 @@ const JobCard = ({
     </div>
 
     <div className={styles.meta}>
-      <p><FaMapMarkerAlt size={14} className={styles.icon} /> {location}</p>
-      <p><FaDollarSign size={14} className={styles.icon} /> {salary}</p>
-      <p><FaCalendarAlt size={14} className={styles.icon} /> Deadline: {deadline}</p>
+      <p><FaMapMarkerAlt size={14} className={styles.map} /> {location}</p>
+      <p><FaDollarSign size={14} className={styles.dollar} /> {salary}</p>
+      <p><FaCalendarAlt size={14} className={styles.calendar} /> Deadline: {deadline}</p>
     </div>
 
     <div className={styles.summary}>
