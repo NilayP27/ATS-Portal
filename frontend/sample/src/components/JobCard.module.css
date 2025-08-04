@@ -31,15 +31,26 @@
   margin-top: 0.5rem;
 }
 
+.icon {
+  margin-right: 6px;
+  color: #444;
+  vertical-align: middle;
+}
+
+.eyeIcon {
+  color: #007bff;
+  transition: transform 0.2s ease;
+}
+
+.eyeIcon:hover {
+  transform: scale(1.1);
+  color: #0056b3;
+}
+
 .pass {
   color: green;
 }
 
 .reject {
   color: red;
-}
-
-.eyeIcon {
-  color: #275df5;
-  cursor: pointer;
 }

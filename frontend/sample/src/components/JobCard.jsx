@@ -1,6 +1,7 @@
 import React from "react";
 import styles from "./JobCard.module.css";
 import { Eye } from "lucide-react";
+import { FaMapMarkerAlt, FaDollarSign, FaCalendarAlt } from "react-icons/fa";
 
 const JobCard = ({
   title,
@@ -24,9 +25,9 @@ const JobCard = ({
     </div>
 
     <div className={styles.meta}>
-      <p>📍 {location}</p>
-      <p>💲 {salary}</p>
-      <p>📅 Deadline: {deadline}</p>
+      <p><FaMapMarkerAlt size={14} className={styles.icon} /> {location}</p>
+      <p><FaDollarSign size={14} className={styles.icon} /> {salary}</p>
+      <p><FaCalendarAlt size={14} className={styles.icon} /> Deadline: {deadline}</p>
     </div>
 
     <div className={styles.summary}>
