@@ -2,25 +2,30 @@ const User = require('../models/User');
 const bcrypt = require('bcrypt');
 const sendEmail = require('../utils/sendEmail');
 
+// --- Signup ---
 exports.signup = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, username } = req.body;
 
     const existing = await User.findOne({ email });
     if (existing) {
       return res.status(400).json({ message: "User already exists" });
     }
 
-    const user = new User({ email, password }); 
+    const user = new User({ email, password, username });
     await user.save();
 
-    res.status(201).json({ message: "User registered successfully", user });
+    res.status(201).json({
+      message: "User registered successfully",
+      user: { email: user.email, username: user.username }
+    });
   } catch (error) {
     console.error("Signup error:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
 
+// --- Login ---
 exports.login = async (req, res) => {
   const { email, password } = req.body;
   try {
@@ -37,13 +42,20 @@ exports.login = async (req, res) => {
     }
 
     console.log("✅ User logged in:", user.email);
-    res.json({ message: "Login successful", user: { email: user.email } });
+    res.json({
+      message: "Login successful",
+      user: {
+        email: user.email,
+        username: user.username
+      }
+    });
   } catch (err) {
     console.error("Login error:", err);
     res.status(500).json({ message: "Server error" });
   }
 };
 
+// --- Request Reset Code ---
 exports.requestResetCode = async (req, res) => {
   const { email } = req.body;
   try {
@@ -57,11 +69,13 @@ exports.requestResetCode = async (req, res) => {
 
     await sendEmail(email, 'Your Reset Code', `Your reset code: ${code}`);
     res.json({ message: 'Reset code sent' });
-  } catch {
+  } catch (error) {
+    console.error("Reset code error:", error);
     res.status(500).json({ message: 'Error sending reset code' });
   }
 };
 
+// --- Reset Password ---
 exports.resetPassword = async (req, res) => {
   const { email, code, newPassword } = req.body;
   try {
@@ -75,14 +89,14 @@ exports.resetPassword = async (req, res) => {
       return res.status(400).json({ message: 'Invalid or expired code' });
     }
 
-    user.password = newPassword; 
+    user.password = newPassword;
     user.resetCode = undefined;
     user.resetCodeExpires = undefined;
     await user.save();
 
     res.json({ message: 'Password reset successful' });
-  } catch {
+  } catch (error) {
+    console.error("Password reset error:", error);
     res.status(500).json({ message: 'Server error' });
   }
 };
-
