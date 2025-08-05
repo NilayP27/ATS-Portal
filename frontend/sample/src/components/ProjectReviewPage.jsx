@@ -9,6 +9,7 @@ const ProjectOverview = () => {
   const { projectId } = useParams();
 
   const [interviewStats, setInterviewStats] = useState({});
+  const [currentLevelStats, setCurrentLevelStats] = useState({});
   const [roleStats, setRoleStats] = useState([]);
   const [projectRoles, setProjectRoles] = useState([]);
 
@@ -19,7 +20,9 @@ const ProjectOverview = () => {
         const candidateRes = await axios.get(
           `http://localhost:5000/api/candidates/${projectId}/overview`
         );
+
         setInterviewStats(candidateRes.data.interviewStats || {});
+        setCurrentLevelStats(candidateRes.data.currentLevelStats || {});
         setRoleStats(candidateRes.data.roles || []);
 
         // 2. Fetch project info including roles
@@ -46,7 +49,7 @@ const ProjectOverview = () => {
         style={{
           display: "flex",
           alignItems: "center",
-          color: "#1f2937", // Match the Interview Dashboard color (adjust as needed)
+          color: "#1f2937",
           cursor: "pointer",
         }}
         onClick={() => navigate("/dashboard")}
@@ -57,28 +60,30 @@ const ProjectOverview = () => {
         <h2 style={{ margin: 0 }}>Interview Dashboard</h2>
       </div>
 
+      {/* Level-wise summary cards */}
       <div style={{ display: "flex", gap: "1rem" }}>
         {["L0", "L1", "L2"].map((level) => {
-          const stats = interviewStats[level] || {
+          const feedbackStats = interviewStats[level] || {
             passed: 0,
             pending: 0,
             rejected: 0,
           };
-          const total = stats.passed + stats.pending + stats.rejected;
+          const currentTotal = currentLevelStats[level] || 0;
 
           return (
             <InterviewLevelCard
               key={level}
               level={level}
-              total={total}
-              passed={stats.passed}
-              pending={stats.pending}
-              rejected={stats.rejected}
+              total={currentTotal}
+              passed={feedbackStats.passed}
+              pending={feedbackStats.pending}
+              rejected={feedbackStats.rejected}
             />
           );
         })}
       </div>
 
+      {/* Open roles */}
       <h2>Open Roles</h2>
       <div style={{ display: "flex", gap: "2rem", flexWrap: "wrap" }}>
         {projectRoles.map((role, idx) => {
