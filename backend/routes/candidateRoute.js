@@ -4,7 +4,6 @@ const Candidate = require('../models/Candidate');
 
 const router = express.Router();
 
-// ➤ Create a new candidate
 router.post('/', async (req, res) => {
   try {
     const candidate = new Candidate(req.body);
@@ -16,28 +15,33 @@ router.post('/', async (req, res) => {
   }
 });
 
-// ➤ Get interview stats & role-wise stats for a project
-// ➤ Get interview stats & role-wise stats for a project
-// ➤ Get interview stats & role-wise stats for a project
 router.get('/:projectId/overview', async (req, res) => {
   const { projectId } = req.params;
 
   try {
     const candidates = await Candidate.find({ projectId });
 
-    // Initialize interview level-wise stats
     const interviewStats = {
       L0: { passed: 0, pending: 0, rejected: 0 },
       L1: { passed: 0, pending: 0, rejected: 0 },
       L2: { passed: 0, pending: 0, rejected: 0 },
     };
 
+    const currentLevelStats = {
+      L0: 0,
+      L1: 0,
+      L2: 0,
+    };
+
     const roleStatsMap = {};
 
     candidates.forEach((candidate) => {
-      const { roleTitle, feedback = [] } = candidate;
+      const { roleTitle, feedback = [], interviewLevel } = candidate;
 
-      // Ensure role exists in map
+      if (interviewLevel && currentLevelStats[interviewLevel] !== undefined) {
+        currentLevelStats[interviewLevel] += 1;
+      }
+
       if (!roleStatsMap[roleTitle]) {
         roleStatsMap[roleTitle] = {
           total: 0,
@@ -50,13 +54,12 @@ router.get('/:projectId/overview', async (req, res) => {
 
       let hasRejected = false;
 
-      // Update feedback stats per level
       feedback.forEach((fb) => {
         const { level, status } = fb;
-        const stat = status?.toLowerCase();
+        const lowerStatus = status?.toLowerCase();
 
-        if (interviewStats[level] && interviewStats[level][stat] !== undefined) {
-          interviewStats[level][stat] += 1;
+        if (interviewStats[level] && interviewStats[level][lowerStatus] !== undefined) {
+          interviewStats[level][lowerStatus] += 1;
         }
 
         if (status === 'REJECTED') {
@@ -84,8 +87,8 @@ router.get('/:projectId/overview', async (req, res) => {
 
     res.json({
       interviewStats,
+      currentLevelStats,
       roles: roleStats,
-      candidates, // Optional: send to frontend if needed
     });
   } catch (err) {
     console.error('Error fetching project overview:', err);
@@ -93,8 +96,6 @@ router.get('/:projectId/overview', async (req, res) => {
   }
 });
 
-
-// ➤ Get all candidates for a specific project
 router.get('/:projectId', async (req, res) => {
   try {
     const candidates = await Candidate.find({ projectId: req.params.projectId });
@@ -105,7 +106,6 @@ router.get('/:projectId', async (req, res) => {
   }
 });
 
-// ➤ Get candidates by projectId AND roleTitle
 router.get('/by-project-role/:projectId/:roleTitle', async (req, res) => {
   const { projectId, roleTitle } = req.params;
 
@@ -121,7 +121,6 @@ router.get('/by-project-role/:projectId/:roleTitle', async (req, res) => {
   }
 });
 
-// ➤ Update candidate's interview level
 router.put('/:id/interview-level', async (req, res) => {
   const { id } = req.params;
   const { interviewLevel } = req.body;
@@ -139,8 +138,6 @@ router.put('/:id/interview-level', async (req, res) => {
   }
 });
 
-// ➤ Get a candidate by ID (used in InterviewFeedback component)
-// ➤ Get a candidate by ID (used in InterviewFeedback component)
 router.get('/by-id/:id', async (req, res) => {
   const { id } = req.params;
   try {
@@ -148,14 +145,13 @@ router.get('/by-id/:id', async (req, res) => {
     if (!candidate) {
       return res.status(404).json({ message: 'Candidate not found' });
     }
-    res.json(candidate); // ✅ Send full candidate object including feedback
+    res.json(candidate);
   } catch (err) {
     console.error('Error fetching candidate by ID:', err);
     res.status(500).json({ message: 'Server error' });
   }
 });
 
-// ➤ Add or update a feedback item for a candidate
 router.put('/:id/feedback', async (req, res) => {
   const { id } = req.params;
   const { level, comment, status } = req.body;
@@ -173,10 +169,8 @@ router.put('/:id/feedback', async (req, res) => {
     const existingIndex = candidate.feedback.findIndex(fb => fb.level === level);
 
     if (existingIndex !== -1) {
-      // Update existing feedback
       candidate.feedback[existingIndex] = { level, comment, status };
     } else {
-      // Add new feedback entry
       candidate.feedback.push({ level, comment, status });
     }
 
@@ -187,6 +181,5 @@ router.put('/:id/feedback', async (req, res) => {
     res.status(500).json({ error: 'Failed to save feedback' });
   }
 });
-
 
 module.exports = router;

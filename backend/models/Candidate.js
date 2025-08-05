@@ -15,7 +15,7 @@ const feedbackSchema = new mongoose.Schema({
     enum: ['PENDING', 'PASSED', 'REJECTED'],
     default: 'PENDING',
   },
-}, { _id: false }); // prevents automatic _id generation for subdocs
+}, { _id: false });
 
 const candidateSchema = new mongoose.Schema({
   projectId: {
@@ -46,7 +46,7 @@ const candidateSchema = new mongoose.Schema({
     enum: ['PENDING', 'PASSED', 'REJECTED'],
     default: 'PENDING',
   },
-  feedback: [feedbackSchema], // ⬅️ Add this line
+  feedback: [feedbackSchema],
   createdAt: {
     type: Date,
     default: Date.now,

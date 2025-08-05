@@ -2,15 +2,13 @@ const express = require('express');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-const Project = require('../models/Project'); // Adjust path if needed
+const Project = require('../models/Project');
 
 const router = express.Router();
 
-// Ensure upload directory exists
 const uploadDir = path.join(__dirname, '../uploads');
 if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir);
 
-// Multer setup
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, uploadDir);
@@ -22,7 +20,6 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-// POST /api/projects
 router.post('/', upload.array('jobDescFiles'), async (req, res) => {
   try {
     if (!req.body.data) {
@@ -49,6 +46,7 @@ router.post('/', upload.array('jobDescFiles'), async (req, res) => {
     res.status(500).json({ error: 'Failed to create project' });
   }
 });
+
 router.get('/', async (req, res) => {
   try {
     const projects = await Project.find();
@@ -58,7 +56,7 @@ router.get('/', async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch projects' });
   }
 });
-// GET /api/projects/:projectId - Fetch a specific project including its roles
+
 router.get('/:projectId', async (req, res) => {
   try {
     const project = await Project.findById(req.params.projectId);
@@ -71,6 +69,5 @@ router.get('/:projectId', async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch project' });
   }
 });
-
 
 module.exports = router;
