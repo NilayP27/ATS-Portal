@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 
 const SignupForm = () => {
+  const [username, setUsername] = useState('');  // 👈 new state
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -14,7 +15,7 @@ const SignupForm = () => {
     e.preventDefault();
 
     if (password !== confirmPassword) {
-      alert(" Passwords do not match");
+      alert("Passwords do not match");
       return;
     }
 
@@ -26,20 +27,20 @@ const SignupForm = () => {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({ username, email, password })  // 👈 include username
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        alert(' Registration successful!');
+        alert('Registration successful!');
         navigate('/'); 
       } else {
-        alert(` ${data.message || 'Signup failed'}`);
+        alert(`${data.message || 'Signup failed'}`);
       }
     } catch (error) {
       console.error('Signup error:', error);
-      alert(' Something went wrong. Please try again later.');
+      alert('Something went wrong. Please try again later.');
     } finally {
       setLoading(false);
     }
@@ -49,13 +50,21 @@ const SignupForm = () => {
     <div className="login-container">
       <div className="login-box">
         <div className="icon-wrapper">
-  <img src="/image.png" alt="Company Logo" className="company-logo" />
-</div>
+          <img src="/image.png" alt="Company Logo" className="company-logo" />
+        </div>
 
         <h2 className="team-name">VDart</h2>
         <p className="welcome-text">Create your account</p>
 
         <form onSubmit={handleSubmit} className="login-form">
+          <input
+            type="text"
+            placeholder="Username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            required
+            className="input-field"
+          />
           <input
             type="email"
             placeholder="Email address"

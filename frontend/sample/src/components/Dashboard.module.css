@@ -1,9 +1,168 @@
-.container {
-  padding: 40px;
-  background-color: #f5f9ff;
-  min-height: 100vh;
+/* Reset and base styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
+/* Page wrapper */
+.dashboardWrapper {
+  display: flex;
+  height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 220px;
+  background-color: #f5f7fa;
+  padding: 20px;
+  border-right: 1px solid #ddd;
+}
+
+.sidebarTitle {
+  font-size: 1.5rem;
+  margin-bottom: 30px;
+  color: #3b3be0;
+}
+
+.createButton {
+  background: linear-gradient(to right, #4d4dff, #706cff);
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+.createButton:hover {
+  filter: brightness(1.1);
+  transform: scale(1.02);
+  background-color:#706cff;
+}
+
+.createButton:active {
+  transform: scale(0.98);
+}
+
+/* Main content area */
+.mainContent {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  position: relative; /* ✅ important for absolute child */
+}
+
+/* Top bar */
+.topBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  position: relative; /* ✅ */
+  z-index: 1;
+}
+
+.welcome {
+  font-size: 1.2rem;
+}
+
+.topRight {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  position: relative;
+}
+
+/* Notification */
+.notificationWrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.notificationIcon {
+  font-size: 1.5rem;
+  color: #333;
+  cursor: pointer;
+  position: relative;
+}
+
+.notificationBadge {
+  position: absolute;
+  top: -6px;
+  right: -8px;
+  background-color: red;
+  color: white;
+  font-size: 0.7rem;
+  padding: 2px 6px;
+  border-radius: 50%;
+  font-weight: bold;
+  line-height: 1;
+}
+
+.notificationDropdown {
+  position: absolute;
+  top: 30px;
+  right: 0;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  width: 250px;
+  max-height: 200px;
+  overflow-y: auto;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+  padding: 0.5rem;
+
+  /* Animation */
+  opacity: 0;
+  transform: translateY(-10px);
+  pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* When visible */
+.notificationDropdown.show {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+
+.notificationItem {
+  padding: 10px 12px;
+  font-size: 0.9rem;
+  border-bottom: 1px solid #f0f0f0;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.notificationItem:hover {
+  background-color: #f9f9f9;
+}
+
+.notificationEmpty {
+  padding: 10px;
+  color: gray;
+  font-style: italic;
+}
+
+/* Logout button */
+.logoutButton {
+  background-color: #d9534f;
+  border: none;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.logoutButton:hover {
+  background-color: #c9302c;
+}
+
+/* Header */
 .header {
   display: flex;
   justify-content: space-between;
@@ -21,17 +180,7 @@
   margin-top: 4px;
 }
 
-.createButton {
-  background: linear-gradient(to right, #4d4dff, #706cff);
-  color: white;
-  padding: 12px 20px;
-  border: none;
-  border-radius: 12px;
-  font-weight: bold;
-  cursor: pointer;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-}
-
+/* Card Grid */
 .cardGrid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -42,7 +191,7 @@
   background-color: white;
   border-radius: 18px;
   padding: 24px;
-  box-shadow: 0 6px 30px rgba(0,0,0,0.05);
+  box-shadow: 0 6px 30px rgba(0, 0, 0, 0.05);
   position: relative;
 }
 
@@ -55,19 +204,17 @@
   margin-bottom: 16px;
 }
 
-.filterIcon {
-  position: absolute;
-  top: 0;
-  right: 0;
-  font-size: 20px;
-  color: #3b3be0;
-  cursor: pointer;
-}
-
+/* Project Box */
 .projectBox {
   border: 1px solid #e2e2e2;
   border-radius: 12px;
   padding: 16px;
+  transition: background-color 0.2s ease;
+  cursor: pointer;
+}
+
+.projectBox:hover {
+  background-color: #f0f0f0;
 }
 
 .projectHeader {
@@ -79,6 +226,24 @@
 .statusActive {
   background-color: #d4f5e6;
   color: #1fa65d;
+  padding: 4px 10px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.statusHold {
+  background-color: #fff3cd;
+  color: #856404;
+  padding: 4px 10px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.statusCompleted {
+  background-color: #e2e3e5;
+  color: #6c757d;
   padding: 4px 10px;
   border-radius: 10px;
   font-weight: 600;
@@ -103,6 +268,7 @@
   font-weight: 600;
 }
 
+/* Warning box (optional section) */
 .warningBox {
   background-color: #fff7e6;
   border: 1px solid #ffe58f;
@@ -116,15 +282,4 @@
 .warningBox ul {
   margin-top: 6px;
   padding-left: 20px;
-}
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  /* font-family: system-ui, Avenir, Helvetica, Arial, sans-serif; */
-}
-.projectBox:hover {
-  background-color: #f0f0f0;
-  transition: background-color 0.2s ease;
 }

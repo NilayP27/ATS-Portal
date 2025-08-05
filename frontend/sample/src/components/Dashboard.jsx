@@ -2,12 +2,30 @@ import React, { useEffect, useState } from 'react';
 import styles from './Dashboard.module.css';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { FaBell } from 'react-icons/fa'; // ✅ import bell icon
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const [projects, setProjects] = useState([]);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+  const username = localStorage.getItem('username') || 'User';
 
-  // Fetch projects from backend
+  useEffect(() => {
+    fetchProjects();
+    fetchNotifications(); // load notifications
+  }, []);
+  useEffect(() => {
+    // ✅ Close notifications dropdown when clicking outside
+    const handleClickOutside = (event) => {
+      if (!event.target.closest(`.${styles.notificationWrapper}`)) {
+        setShowNotifications(false);
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, []);
   const fetchProjects = async () => {
     try {
       const res = await axios.get('http://localhost:5000/api/projects');
@@ -17,9 +35,14 @@ const Dashboard = () => {
     }
   };
 
-  useEffect(() => {
-    fetchProjects();
-  }, []);
+  const fetchNotifications = async () => {
+    // Dummy static notifications for now
+    setNotifications([
+      { id: 1, text: 'New project assigned: Alpha' },
+      { id: 2, text: 'Role closed in Beta project' },
+      { id: 3, text: 'System maintenance at 10PM' }
+    ]);
+  };
 
   const handleCreateProject = () => {
     navigate('/create-project');
@@ -29,7 +52,15 @@ const Dashboard = () => {
     navigate(`/project-review/${projectId}`);
   };
 
-  // Function to render project cards based on status
+  const handleLogout = () => {
+    localStorage.clear();
+    navigate('/');
+  };
+
+  const toggleNotifications = () => {
+    setShowNotifications(!showNotifications);
+  };
+
   const renderProjectsByStatus = (status) =>
     projects
       .filter((project) => project.status === status)
@@ -76,40 +107,84 @@ const Dashboard = () => {
       });
 
   return (
-    <div className={styles.container}>
-      <div className={styles.header}>
-        <div>
-          <h2 className={styles.title}>VDart Team Dashboard</h2>
-          <p className={styles.subtitle}>Manage your recruitment projects</p>
-        </div>
+    <div className={styles.dashboardWrapper}>
+      {/* Sidebar */}
+      <div className={styles.sidebar}>
+        <h2 className={styles.sidebarTitle}>ATS VDart</h2>
         <button className={styles.createButton} onClick={handleCreateProject}>
           + Create Project
         </button>
       </div>
 
-      <div className={styles.cardGrid}>
-        {/* Active Projects */}
-        <div className={styles.card}>
-          <div className={styles.cardHeader}>
-            <h3>Active Projects</h3>
-            <p className={styles.cardSubtitle}>Currently in progress</p>
-            <div className={styles.filterIcon}>🔍</div>
+      {/* Main Content */}
+      <div className={styles.mainContent}>
+        {/* Top Bar */}
+        <div className={styles.topBar}>
+          <div className={styles.welcome}>
+            Welcome, <strong>{username}</strong>
           </div>
-          {renderProjectsByStatus('ACTIVE')}
+
+          <div className={styles.topRight}>
+            {/* Notification Bell */}
+            <div className={styles.notificationWrapper}>
+  <FaBell className={styles.notificationIcon} onClick={toggleNotifications} />
+  {notifications.length > 0 && (
+    <span className={styles.notificationBadge}>{notifications.length}</span>
+  )}
+  <div
+    className={`${styles.notificationDropdown} ${
+      showNotifications ? styles.show : ''
+    }`}
+  >
+    {notifications.length > 0 ? (
+      notifications.map((note) => (
+        <div key={note.id} className={styles.notificationItem}>
+          {note.text}
+        </div>
+      ))
+    ) : (
+      <div className={styles.notificationItem}>No new notifications</div>
+    )}
+  </div>
+</div>
+
+
+
+            {/* Logout */}
+            <button className={styles.logoutButton} onClick={handleLogout}>
+              Logout
+            </button>
+          </div>
         </div>
 
-        {/* Projects on Hold */}
-        <div className={styles.card}>
-          <h3>Projects on Hold</h3>
-          <p className={styles.cardSubtitle}>Temporarily paused</p>
-          {renderProjectsByStatus('HOLD')}
+        {/* Header and Cards */}
+        <div className={styles.header}>
+          <div>
+            <h2 className={styles.title}>Team Dashboard</h2>
+            <p className={styles.subtitle}>Manage your recruitment projects</p>
+          </div>
         </div>
 
-        {/* Completed Projects */}
-        <div className={styles.card}>
-          <h3>Completed Projects</h3>
-          <p className={styles.cardSubtitle}>Successfully finished</p>
-          {renderProjectsByStatus('COMPLETED')}
+        <div className={styles.cardGrid}>
+          <div className={styles.card}>
+            <div className={styles.cardHeader}>
+              <h3>Active Projects</h3>
+              <p className={styles.cardSubtitle}>Currently in progress</p>
+            </div>
+            {renderProjectsByStatus('ACTIVE')}
+          </div>
+
+          <div className={styles.card}>
+            <h3>Projects on Hold</h3>
+            <p className={styles.cardSubtitle}>Temporarily paused</p>
+            {renderProjectsByStatus('HOLD')}
+          </div>
+
+          <div className={styles.card}>
+            <h3>Completed Projects</h3>
+            <p className={styles.cardSubtitle}>Successfully finished</p>
+            {renderProjectsByStatus('COMPLETED')}
+          </div>
         </div>
       </div>
     </div>

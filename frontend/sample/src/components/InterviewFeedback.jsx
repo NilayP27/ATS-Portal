@@ -77,20 +77,32 @@ const InterviewFeedback = () => {
   };
 
   const addFeedback = () => {
-    const usedLevels = feedbackList.map(f => f.level).filter(Boolean);
-    const possibleLevels = ["L0", "L1", "L2"];
-    const nextAvailable = possibleLevels.find(lvl => !usedLevels.includes(lvl));
+  const usedLevels = feedbackList.map(f => f.level).filter(Boolean);
+  const possibleLevels = ["L0", "L1", "L2"];
+  const nextAvailable = possibleLevels.find(lvl => !usedLevels.includes(lvl));
 
-    if (!nextAvailable) {
-      toast.warn("All feedback levels (L0, L1, L2) are already used.");
+  if (!nextAvailable) {
+    toast.warn("All feedback levels (L0, L1, L2) are already used.");
+    return;
+  }
+
+  // Prevent adding next level if previous one is REJECTED
+  const previousIndex = possibleLevels.indexOf(nextAvailable) - 1;
+  if (previousIndex >= 0) {
+    const previousLevel = possibleLevels[previousIndex];
+    const previousFeedback = feedbackList.find(f => f.level === previousLevel);
+    if (previousFeedback && previousFeedback.status === "REJECTED") {
+      toast.warn(`Cannot add ${nextAvailable} feedback. Candidate was rejected in ${previousLevel}.`);
       return;
     }
+  }
 
-    setFeedbackList([
-      ...feedbackList,
-      { level: nextAvailable, comment: "", status: "PENDING", isNew: true, isEditing: true }
-    ]);
-  };
+  setFeedbackList([
+    ...feedbackList,
+    { level: nextAvailable, comment: "", status: "PENDING", isNew: true, isEditing: true }
+  ]);
+};
+
 
   const toggleEdit = (index) => {
     const updated = [...feedbackList];
@@ -100,7 +112,7 @@ const InterviewFeedback = () => {
 
   return (
     <div className="feedback-container">
-      <ToastContainer position="top-center" autoClose={3000} />
+      <ToastContainer position="top-center" autoClose={1500} />
       <div className="candidate-header">
         <span className="back-arrow" onClick={() => navigate(-1)}>←</span>
         <div>
@@ -122,7 +134,7 @@ const InterviewFeedback = () => {
                 <span className={getStatusClass(fb.status)}>{fb.status}</span>
               )}
               {!fb.isNew && !fb.isEditing && (
-                <button onClick={() => toggleEdit(index)}>✏️ Edit</button>
+                <button onClick={() => toggleEdit(index)}> Edit</button>
               )}
             </div>
 
