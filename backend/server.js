@@ -13,7 +13,6 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use('/uploads', express.static('uploads'));
-console.log("Connecting to Mongo URI:", process.env.MONGO_URI);
 
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
