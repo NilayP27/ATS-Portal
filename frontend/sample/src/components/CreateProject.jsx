@@ -29,6 +29,24 @@ const CreateProjectForm = () => {
 
   const navigate = useNavigate();
 
+  // Common input handler for top-level fields
+  const handleInputChange = (setter) => (e) => {
+    setter(e.target.value);
+  };
+
+  // Common input handler for dynamic role fields
+  const handleDynamicInputChange = (index, field) => (e) => {
+    const updatedRoles = [...roles];
+    updatedRoles[index][field] = e.target.value;
+    setRoles(updatedRoles);
+  };
+
+  const handleFileChange = (index, file) => {
+    const updatedRoles = [...roles];
+    updatedRoles[index].file = file;
+    setRoles(updatedRoles);
+  };
+
   const handleAddRole = () => {
     setRoles([
       ...roles,
@@ -43,18 +61,6 @@ const CreateProjectForm = () => {
         file: null,
       },
     ]);
-  };
-
-  const handleRoleChange = (index, field, value) => {
-    const updatedRoles = [...roles];
-    updatedRoles[index][field] = value;
-    setRoles(updatedRoles);
-  };
-
-  const handleFileChange = (index, file) => {
-    const updatedRoles = [...roles];
-    updatedRoles[index].file = file;
-    setRoles(updatedRoles);
   };
 
   const handleSubmit = async () => {
@@ -113,23 +119,23 @@ const CreateProjectForm = () => {
           placeholder="Enter client name"
           className={styles.input}
           value={clientName}
-          onChange={(e) => setClientName(e.target.value)}
+          onChange={handleInputChange(setClientName)}
         />
         <input
           type="text"
           placeholder="Enter project name"
           className={styles.input}
           value={projectName}
-          onChange={(e) => setProjectName(e.target.value)}
+          onChange={handleInputChange(setProjectName)}
         />
         <input
           type="text"
           placeholder="Enter location"
           className={styles.input}
           value={location}
-          onChange={(e) => setLocation(e.target.value)}
+          onChange={handleInputChange(setLocation)}
         />
-        <select className={styles.input} value={type} onChange={(e) => setType(e.target.value)}>
+        <select className={styles.input} value={type} onChange={handleInputChange(setType)}>
           <option value="Staffing">Staffing</option>
           <option value="Consulting">Project</option>
         </select>
@@ -139,7 +145,7 @@ const CreateProjectForm = () => {
             type="date"
             className={styles.input}
             value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
+            onChange={handleInputChange(setStartDate)}
           />
         </div>
         <input
@@ -147,13 +153,9 @@ const CreateProjectForm = () => {
           placeholder="Enter lead name"
           className={styles.input}
           value={lead}
-          onChange={(e) => setLead(e.target.value)}
+          onChange={handleInputChange(setLead)}
         />
-        <select
-          className={styles.input}
-          value={status}
-          onChange={(e) => setStatus(e.target.value)}
-        >
+        <select className={styles.input} value={status} onChange={handleInputChange(setStatus)}>
           <option value="ACTIVE">Active</option>
           <option value="HOLD">Hold</option>
           <option value="COMPLETED">Completed</option>
@@ -172,14 +174,14 @@ const CreateProjectForm = () => {
               placeholder="e.g. Frontend Developer"
               className={styles.input}
               value={role.title}
-              onChange={(e) => handleRoleChange(index, 'title', e.target.value)}
+              onChange={handleDynamicInputChange(index, 'title')}
             />
             <input
               type="text"
               placeholder="e.g. New York"
               className={styles.input}
               value={role.location}
-              onChange={(e) => handleRoleChange(index, 'location', e.target.value)}
+              onChange={handleDynamicInputChange(index, 'location')}
             />
             <div className={styles.inlineInput}>
               <input
@@ -187,12 +189,12 @@ const CreateProjectForm = () => {
                 placeholder="80000"
                 className={styles.input}
                 value={role.salary}
-                onChange={(e) => handleRoleChange(index, 'salary', e.target.value)}
+                onChange={handleDynamicInputChange(index, 'salary')}
               />
               <select
                 className={styles.currencySelect}
                 value={role.currency}
-                onChange={(e) => handleRoleChange(index, 'currency', e.target.value)}
+                onChange={handleDynamicInputChange(index, 'currency')}
               >
                 <option value="USD">USD</option>
                 <option value="INR">INR</option>
@@ -207,7 +209,7 @@ const CreateProjectForm = () => {
                 type="date"
                 className={styles.input}
                 value={role.deadline}
-                onChange={(e) => handleRoleChange(index, 'deadline', e.target.value)}
+                onChange={handleDynamicInputChange(index, 'deadline')}
               />
             </div>
             <div className={styles.inputGroup}>
@@ -216,7 +218,7 @@ const CreateProjectForm = () => {
                 type="date"
                 className={styles.input}
                 value={role.startDate}
-                onChange={(e) => handleRoleChange(index, 'startDate', e.target.value)}
+                onChange={handleDynamicInputChange(index, 'startDate')}
               />
             </div>
             <div className={styles.inputGroup}>
@@ -225,7 +227,7 @@ const CreateProjectForm = () => {
                 type="date"
                 className={styles.input}
                 value={role.endDate}
-                onChange={(e) => handleRoleChange(index, 'endDate', e.target.value)}
+                onChange={handleDynamicInputChange(index, 'endDate')}
               />
             </div>
             <div className={styles.fileInputContainer}>
