@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
-import 'react-toastify/dist/ReactToastify.css';
+import "react-toastify/dist/ReactToastify.css";
 import "./InterviewFeedback.css";
 
 const InterviewFeedback = () => {
@@ -13,15 +13,30 @@ const InterviewFeedback = () => {
   const [feedbackList, setFeedbackList] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // ✅ Get token and role from localStorage
+  const token = localStorage.getItem("token") || "";
+  const role = localStorage.getItem("role") || "";
+
+  // ✅ Roles allowed to edit
+  const canEditFeedback = ["Admin", "Recruiter Lead", "Recruiter"].includes(role);
+
+  // ✅ API: Fetch candidate with Authorization header
   const fetchCandidate = async () => {
     try {
-      const res = await axios.get(`/api/candidates/by-id/${id}`);
+      const res = await axios.get(`http://localhost:5000/api/candidates/by-id/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
       setCandidate(res.data);
-      const withFlags = (res.data.feedback || []).map(fb => ({
+
+      const withFlags = (res.data.feedback || []).map((fb) => ({
         ...fb,
         isNew: false,
-        isEditing: false, // New flag for editing existing
+        isEditing: false,
       }));
+
       setFeedbackList(withFlags);
     } catch (err) {
       console.error("Error fetching candidate:", err);
@@ -33,6 +48,7 @@ const InterviewFeedback = () => {
 
   useEffect(() => {
     fetchCandidate();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   const getStatusClass = (status) => {
@@ -42,7 +58,6 @@ const InterviewFeedback = () => {
       case "REJECTED":
         return "status rejected";
       case "PENDING":
-        return "status pending";
       default:
         return "status pending";
     }
@@ -54,6 +69,7 @@ const InterviewFeedback = () => {
     setFeedbackList(updated);
   };
 
+  // ✅ Save feedback with Authorization header
   const handleSave = async (index) => {
     const item = feedbackList[index];
 
@@ -63,10 +79,19 @@ const InterviewFeedback = () => {
     }
 
     try {
-      const res = await axios.put(`/api/candidates/${id}/feedback`, item);
+      const res = await axios.put(
+        `http://localhost:5000/api/candidates/${id}/feedback`,
+        item,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
       toast.success("Feedback saved!");
 
-      const savedFb = res.data.feedback.find(fb => fb.level === item.level);
+      const savedFb = res.data.feedback.find((fb) => fb.level === item.level);
       const updated = [...feedbackList];
       updated[index] = { ...savedFb, isNew: false, isEditing: false };
       setFeedbackList(updated);
@@ -77,32 +102,38 @@ const InterviewFeedback = () => {
   };
 
   const addFeedback = () => {
-  const usedLevels = feedbackList.map(f => f.level).filter(Boolean);
-  const possibleLevels = ["L0", "L1", "L2"];
-  const nextAvailable = possibleLevels.find(lvl => !usedLevels.includes(lvl));
+    const usedLevels = feedbackList.map((f) => f.level).filter(Boolean);
+    const possibleLevels = ["L0", "L1", "L2"];
+    const nextAvailable = possibleLevels.find((lvl) => !usedLevels.includes(lvl));
 
-  if (!nextAvailable) {
-    toast.warn("All feedback levels (L0, L1, L2) are already used.");
-    return;
-  }
-
-  // Prevent adding next level if previous one is REJECTED
-  const previousIndex = possibleLevels.indexOf(nextAvailable) - 1;
-  if (previousIndex >= 0) {
-    const previousLevel = possibleLevels[previousIndex];
-    const previousFeedback = feedbackList.find(f => f.level === previousLevel);
-    if (previousFeedback && previousFeedback.status === "REJECTED") {
-      toast.warn(`Cannot add ${nextAvailable} feedback. Candidate was rejected in ${previousLevel}.`);
+    if (!nextAvailable) {
+      toast.warn("All feedback levels (L0, L1, L2) are already used.");
       return;
     }
-  }
 
-  setFeedbackList([
-    ...feedbackList,
-    { level: nextAvailable, comment: "", status: "PENDING", isNew: true, isEditing: true }
-  ]);
-};
+    const previousIndex = possibleLevels.indexOf(nextAvailable) - 1;
+    if (previousIndex >= 0) {
+      const previousLevel = possibleLevels[previousIndex];
+      const previousFeedback = feedbackList.find((f) => f.level === previousLevel);
+      if (previousFeedback && previousFeedback.status === "REJECTED") {
+        toast.warn(
+          `Cannot add ${nextAvailable} feedback. Candidate was rejected in ${previousLevel}.`
+        );
+        return;
+      }
+    }
 
+    setFeedbackList([
+      ...feedbackList,
+      {
+        level: nextAvailable,
+        comment: "",
+        status: "PENDING",
+        isNew: true,
+        isEditing: true,
+      },
+    ]);
+  };
 
   const toggleEdit = (index) => {
     const updated = [...feedbackList];
@@ -114,7 +145,9 @@ const InterviewFeedback = () => {
     <div className="feedback-container">
       <ToastContainer position="top-center" autoClose={1500} />
       <div className="candidate-header">
-        <span className="back-arrow" onClick={() => navigate(-1)}>←</span>
+        <span className="back-arrow" onClick={() => navigate(-1)}>
+          ←
+        </span>
         <div>
           <h2 className="candidate-name">
             {loading ? "Loading..." : candidate?.name || "Unknown Candidate"}
@@ -129,12 +162,14 @@ const InterviewFeedback = () => {
         {feedbackList.map((fb, index) => (
           <div key={index} className="feedback-card editable">
             <div className="feedback-header">
-              <span><strong>Interview {fb.level}</strong></span>
+              <span>
+                <strong>Interview {fb.level}</strong>
+              </span>
               {!fb.isNew && !fb.isEditing && (
                 <span className={getStatusClass(fb.status)}>{fb.status}</span>
               )}
-              {!fb.isNew && !fb.isEditing && (
-                <button onClick={() => toggleEdit(index)}> Edit</button>
+              {canEditFeedback && !fb.isNew && !fb.isEditing && (
+                <button onClick={() => toggleEdit(index)}>✏ Edit</button>
               )}
             </div>
 
@@ -144,6 +179,7 @@ const InterviewFeedback = () => {
                   <select
                     value={fb.status}
                     onChange={(e) => handleInputChange(index, "status", e.target.value)}
+                    disabled={!canEditFeedback}
                   >
                     <option value="PASSED">PASSED</option>
                     <option value="REJECTED">REJECTED</option>
@@ -154,8 +190,11 @@ const InterviewFeedback = () => {
                     onChange={(e) => handleInputChange(index, "comment", e.target.value)}
                     placeholder="Enter feedback comment"
                     rows={3}
+                    disabled={!canEditFeedback}
                   />
-                  <button onClick={() => handleSave(index)}>💾 Save</button>
+                  {canEditFeedback && (
+                    <button onClick={() => handleSave(index)}>💾 Save</button>
+                  )}
                 </>
               ) : (
                 fb.comment?.trim() || "No feedback provided yet"
@@ -164,7 +203,7 @@ const InterviewFeedback = () => {
           </div>
         ))}
 
-        <button onClick={addFeedback}>➕ Add Feedback</button>
+        {canEditFeedback && <button onClick={addFeedback}>➕ Add Feedback</button>}
       </div>
     </div>
   );

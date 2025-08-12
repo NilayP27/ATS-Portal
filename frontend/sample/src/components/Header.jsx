@@ -8,6 +8,9 @@ const Header = ({ username, notifications, handleLogout }) => {
   const [showNotifications, setShowNotifications] = useState(false);
   const dropdownRef = useRef(null);
 
+  // ✅ Get role from localStorage
+  const role = localStorage.getItem('role') || 'User';
+
   const toggleNotifications = () => {
     setShowNotifications((prev) => !prev);
   };
@@ -27,7 +30,7 @@ const Header = ({ username, notifications, handleLogout }) => {
       <div className={styles.leftSection}>
         <div className={styles.logo}>ATS VDart</div>
         <span className={styles.welcomeText}>
-          Welcome, <strong>{username}</strong>
+          Welcome, <strong>{username}</strong> <span className={styles.roleText}>({role})</span>
         </span>
       </div>
 

@@ -10,40 +10,42 @@ const LoginForm = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
- const handleSubmit = async (e) => {
-  e.preventDefault();
-  setLoading(true);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
 
-  try {
-    const response = await fetch('/api/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
-    });
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
 
-    const data = await response.json();
+      const data = await response.json();
 
-    if (response.ok) {
-      // ✅ Save username and email to localStorage
-      localStorage.setItem('username', data.user.username);
-      localStorage.setItem('email', data.user.email);
+      if (response.ok) {
+        // ✅ Save token & user info to localStorage
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('username', data.user.username);
+        localStorage.setItem('email', data.user.email);
+        localStorage.setItem('role', data.user.role);
 
-      toast.success('✅ Login successful!');
+        toast.success('✅ Login successful!');
 
-      setTimeout(() => {
-        navigate('/dashboard');
-      }, 1000);
-    } else {
-      toast.error(`❌ ${data.message}`);
+        // ✅ Always redirect to the same dashboard page
+        setTimeout(() => {
+          navigate('/dashboard');
+        }, 1000);
+      } else {
+        toast.error(`❌ ${data.message || 'Invalid credentials'}`);
+      }
+    } catch (error) {
+      toast.error('⚠️ Server error. Please try again later.');
+      console.error('Login error:', error);
     }
-  } catch (error) {
-    toast.error('⚠️ Server error. Please try again later.');
-    console.error('Login error:', error);
-  }
 
-  setLoading(false);
-};
-
+    setLoading(false);
+  };
 
   return (
     <div className="login-container">
@@ -77,14 +79,12 @@ const LoginForm = () => {
           </button>
         </form>
 
-        <p className="forgot-password" onClick={() => navigate('/forgot-password')}>
+        <p
+          className="forgot-password"
+          onClick={() => navigate('/forgot-password')}
+        >
           Forgot your password?
         </p>
-
-        {/* ➕ Optional Sign Up link */}
-         {/* <p className="signup-link" onClick={() => navigate('/signup')}>
-          Don't have an account? <strong>Sign Up</strong>
-        </p> */}
       </div>
       <ToastContainer position="top-center" autoClose={3000} />
     </div>

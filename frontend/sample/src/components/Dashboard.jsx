@@ -1,15 +1,16 @@
-// src/pages/Dashboard.jsx
 import React, { useEffect, useState } from 'react';
 import styles from './Dashboard.module.css';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import Header from './Header'; // ✅ fixed import
+import Header from './Header';
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const [projects, setProjects] = useState([]);
   const [notifications, setNotifications] = useState([]);
   const username = localStorage.getItem('username') || 'User';
+  const role = localStorage.getItem('role') || '';
+  const token = localStorage.getItem('token');
 
   useEffect(() => {
     fetchProjects();
@@ -18,7 +19,11 @@ const Dashboard = () => {
 
   const fetchProjects = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/projects');
+      const res = await axios.get('http://localhost:5000/api/projects', {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
       setProjects(res.data);
     } catch (err) {
       console.error('Error fetching projects:', err);
@@ -93,9 +98,12 @@ const Dashboard = () => {
 
       <div className={styles.dashboardWrapper}>
         <div className={styles.sidebar}>
-          <button className={styles.createButton} onClick={handleCreateProject}>
-            + Create Project
-          </button>
+          {/* ✅ Only show Create Project for allowed roles */}
+          {['Admin', 'Project Initiator'].includes(role) && (
+            <button className={styles.createButton} onClick={handleCreateProject}>
+              + Create Project
+            </button>
+          )}
         </div>
 
         <div className={styles.mainContent}>
