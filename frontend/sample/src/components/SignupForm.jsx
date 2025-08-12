@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import './LoginForm.css';
 import { useNavigate } from 'react-router-dom';
-import PersonAddIcon from '@mui/icons-material/PersonAdd';
 
 const SignupForm = () => {
   const [username, setUsername] = useState('');  // 👈 new state

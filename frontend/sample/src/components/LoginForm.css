@@ -85,3 +85,34 @@
   cursor: pointer;
   font-size: 14px;
 }
+.password-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.show-password-btn {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: #007bff;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.show-password-btn:hover {
+  text-decoration: underline;
+}
+.show-password-toggle {
+  margin: 8px 0 15px 0;
+  font-size: 0.9rem;
+  color: #007bff;
+  cursor: pointer;
+  text-align: center; /* ✅ Center align */
+}
+
+.show-password-toggle:hover {
+  text-decoration: underline;
+}

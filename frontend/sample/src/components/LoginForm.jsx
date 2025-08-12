@@ -7,6 +7,7 @@ import 'react-toastify/dist/ReactToastify.css';
 const LoginForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -24,15 +25,13 @@ const LoginForm = () => {
       const data = await response.json();
 
       if (response.ok) {
-        // ✅ Save token & user info to localStorage
         localStorage.setItem('token', data.token);
         localStorage.setItem('username', data.user.username);
         localStorage.setItem('email', data.user.email);
         localStorage.setItem('role', data.user.role);
 
-        toast.success('✅ Login successful!');
+        toast.success('Login successful!');
 
-        // ✅ Always redirect to the same dashboard page
         setTimeout(() => {
           navigate('/dashboard');
         }, 1000);
@@ -40,7 +39,7 @@ const LoginForm = () => {
         toast.error(`❌ ${data.message || 'Invalid credentials'}`);
       }
     } catch (error) {
-      toast.error('⚠️ Server error. Please try again later.');
+      toast.error('Server error. Please try again later.');
       console.error('Login error:', error);
     }
 
@@ -66,14 +65,24 @@ const LoginForm = () => {
             required
             className="input-field"
           />
+
           <input
-            type="password"
+            type={showPassword ? 'text' : 'password'}
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
             className="input-field"
           />
+
+          {/* ✅ Centered show/hide toggle */}
+          <p
+            className="show-password-toggle"
+            onClick={() => setShowPassword(!showPassword)}
+          >
+            {showPassword ? 'Hide Password' : 'Show Password'}
+          </p>
+
           <button type="submit" className="sign-in-button" disabled={loading}>
             {loading ? 'Signing in...' : 'Sign In'}
           </button>

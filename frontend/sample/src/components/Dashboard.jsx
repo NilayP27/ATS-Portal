@@ -3,6 +3,8 @@ import styles from './Dashboard.module.css';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Header from './Header';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -40,9 +42,22 @@ const Dashboard = () => {
 
   const handleCreateProject = () => navigate('/create-project');
   const handleProjectClick = (projectId) => navigate(`/project-review/${projectId}`);
+
   const handleLogout = () => {
-    localStorage.clear();
-    navigate('/');
+    toast.info('Logging out...', {
+      position: 'top-center',
+      autoClose: 1500,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: false,
+      draggable: true,
+      progress: undefined,
+    });
+
+    setTimeout(() => {
+      localStorage.clear();
+      navigate('/');
+    }, 1000);
   };
 
   const renderProjectsByStatus = (status) =>
@@ -90,6 +105,9 @@ const Dashboard = () => {
 
   return (
     <div className={styles.dashboardPage}>
+      {/* Toastify container */}
+      <ToastContainer />
+
       <Header
         username={username}
         notifications={notifications}
@@ -98,7 +116,6 @@ const Dashboard = () => {
 
       <div className={styles.dashboardWrapper}>
         <div className={styles.sidebar}>
-          {/* ✅ Only show Create Project for allowed roles */}
           {['Admin', 'Project Initiator'].includes(role) && (
             <button className={styles.createButton} onClick={handleCreateProject}>
               + Create Project
