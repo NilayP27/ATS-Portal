@@ -1,23 +1,37 @@
 const User = require('../models/User');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 const sendEmail = require('../utils/sendEmail');
 
 // --- Signup ---
 exports.signup = async (req, res) => {
   try {
-    const { email, password, username } = req.body;
+    const { email, password, username, role, department, title } = req.body;
 
+    // Check if user already exists
     const existing = await User.findOne({ email });
     if (existing) {
       return res.status(400).json({ message: "User already exists" });
     }
 
-    const user = new User({ email, password, username });
+    // Create new user
+    const user = new User({
+      email,
+      password,
+      username,
+      role: role || "Recruiter", // Default if not provided
+      department,
+      title
+    });
     await user.save();
 
     res.status(201).json({
       message: "User registered successfully",
-      user: { email: user.email, username: user.username }
+      user: {
+        email: user.email,
+        username: user.username,
+        role: user.role
+      }
     });
   } catch (error) {
     console.error("Signup error:", error);
@@ -29,24 +43,32 @@ exports.signup = async (req, res) => {
 exports.login = async (req, res) => {
   const { email, password } = req.body;
   try {
+    // Find user
     const user = await User.findOne({ email });
     if (!user) {
-      console.log("❌ User not found");
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
+    // Check password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      console.log("❌ Password does not match");
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
-    console.log("✅ User logged in:", user.email);
+    // Create JWT
+    const token = jwt.sign(
+      { id: user._id, role: user.role, email: user.email },
+      process.env.JWT_SECRET,
+      { expiresIn: "8h" }
+    );
+
     res.json({
       message: "Login successful",
+      token,
       user: {
         email: user.email,
-        username: user.username
+        username: user.username,
+        role: user.role
       }
     });
   } catch (err) {
@@ -64,7 +86,7 @@ exports.requestResetCode = async (req, res) => {
 
     const code = Math.floor(100000 + Math.random() * 900000).toString();
     user.resetCode = code;
-    user.resetCodeExpires = Date.now() + 15 * 60 * 1000;
+    user.resetCodeExpires = Date.now() + 15 * 60 * 1000; // 15 min
     await user.save();
 
     await sendEmail(email, 'Your Reset Code', `Your reset code: ${code}`);
@@ -89,7 +111,7 @@ exports.resetPassword = async (req, res) => {
       return res.status(400).json({ message: 'Invalid or expired code' });
     }
 
-    user.password = newPassword;
+    user.password = newPassword; // Will be hashed by pre-save hook
     user.resetCode = undefined;
     user.resetCodeExpires = undefined;
     await user.save();
