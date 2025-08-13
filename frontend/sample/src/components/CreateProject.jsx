@@ -28,13 +28,12 @@ const CreateProjectForm = () => {
   ]);
 
   const navigate = useNavigate();
+  const token = localStorage.getItem('token');
 
-  // Common input handler for top-level fields
   const handleInputChange = (setter) => (e) => {
     setter(e.target.value);
   };
 
-  // Common input handler for dynamic role fields
   const handleDynamicInputChange = (index, field) => (e) => {
     const updatedRoles = [...roles];
     updatedRoles[index][field] = e.target.value;
@@ -64,6 +63,12 @@ const CreateProjectForm = () => {
   };
 
   const handleSubmit = async () => {
+    if (!token) {
+      toast.error('You are not logged in. Please login again.');
+      navigate('/');
+      return;
+    }
+
     const formData = new FormData();
 
     roles.forEach((role) => {
@@ -80,7 +85,7 @@ const CreateProjectForm = () => {
       startDate,
       lead,
       status,
-      roles: roles.map(role => {
+      roles: roles.map((role) => {
         const roleCopy = { ...role };
         delete roleCopy.file;
         return roleCopy;
@@ -89,17 +94,33 @@ const CreateProjectForm = () => {
 
     formData.append('data', JSON.stringify(projectData));
 
+    // Debug logs
+    console.log("📦 Token:", token);
+    console.log("📦 FormData entries:", [...formData.entries()]);
+
     try {
       await axios.post('http://localhost:5000/api/projects', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'Authorization': `Bearer ${token}`, // ✅ Added
+        },
       });
+
       toast.success('✅ Project created successfully!');
       setTimeout(() => {
         navigate('/dashboard');
       }, 1500);
     } catch (error) {
       console.error('Error creating project:', error);
-      toast.error('❌ Failed to create project. Please try again.');
+
+      if (error.response?.status === 401) {
+        toast.error('❌ Unauthorized. Please log in again.');
+        navigate('/');
+      } else if (error.response?.status === 403) {
+        toast.error('❌ You do not have permission to create a project.');
+      } else {
+        toast.error('❌ Failed to create project. Please try again.');
+      }
     }
   };
 
@@ -252,17 +273,7 @@ const CreateProjectForm = () => {
         Create Project
       </button>
 
-      <ToastContainer
-        position="top-center"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-      />
+      <ToastContainer position="top-center" autoClose={3000} />
     </div>
   );
 };
