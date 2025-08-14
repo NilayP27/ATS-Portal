@@ -106,7 +106,7 @@ const CreateProjectForm = () => {
         },
       });
 
-      toast.success('✅ Project created successfully!');
+      toast.success(' Project created successfully!');
       setTimeout(() => {
         navigate('/dashboard');
       }, 1500);
@@ -114,12 +114,12 @@ const CreateProjectForm = () => {
       console.error('Error creating project:', error);
 
       if (error.response?.status === 401) {
-        toast.error('❌ Unauthorized. Please log in again.');
+        toast.error(' Unauthorized. Please log in again.');
         navigate('/');
       } else if (error.response?.status === 403) {
-        toast.error('❌ You do not have permission to create a project.');
+        toast.error(' You do not have permission to create a project.');
       } else {
-        toast.error('❌ Failed to create project. Please try again.');
+        toast.error('Failed to create project. Please try again.');
       }
     }
   };
@@ -135,53 +135,60 @@ const CreateProjectForm = () => {
       <p className={styles.subtitle}>Set up a new recruitment project</p>
 
       <div className={styles.formGrid}>
-        <input
-          type="text"
-          placeholder="Enter client name"
-          className={styles.input}
-          value={clientName}
-          onChange={handleInputChange(setClientName)}
-        />
-        <input
-          type="text"
-          placeholder="Enter project name"
-          className={styles.input}
-          value={projectName}
-          onChange={handleInputChange(setProjectName)}
-        />
-        <input
-          type="text"
-          placeholder="Enter location"
-          className={styles.input}
-          value={location}
-          onChange={handleInputChange(setLocation)}
-        />
-        <select className={styles.input} value={type} onChange={handleInputChange(setType)}>
-          <option value="Staffing">Staffing</option>
-          <option value="Consulting">Project</option>
-        </select>
-        <div className={styles.inputGroup}>
-          <label className={styles.label}>Requisition Date</label>
-          <input
-            type="date"
-            className={styles.input}
-            value={startDate}
-            onChange={handleInputChange(setStartDate)}
-          />
-        </div>
-        <input
-          type="text"
-          placeholder="Enter lead name"
-          className={styles.input}
-          value={lead}
-          onChange={handleInputChange(setLead)}
-        />
-        <select className={styles.input} value={status} onChange={handleInputChange(setStatus)}>
-          <option value="ACTIVE">Active</option>
-          <option value="HOLD">Hold</option>
-          <option value="COMPLETED">Completed</option>
-        </select>
-      </div>
+  <input
+    type="text"
+    placeholder="Enter client name"
+    className={styles.input}
+    value={clientName}
+    onChange={handleInputChange(setClientName)}
+  />
+  <input
+    type="text"
+    placeholder="Enter project name"
+    className={styles.input}
+    value={projectName}
+    onChange={handleInputChange(setProjectName)}
+  />
+  <input
+    type="text"
+    placeholder="Enter location"
+    className={styles.input}
+    value={location}
+    onChange={handleInputChange(setLocation)}
+  />
+  <select className={styles.input} value={type} onChange={handleInputChange(setType)}>
+    <option value="Staffing">Staffing</option>
+    <option value="Consulting">Project</option>
+  </select>
+
+  <div className={styles.inputGroup}>
+    <label className={styles.label}>Requisition Date</label>
+    <input
+      type="date"
+      className={styles.input}
+      value={startDate}
+      onChange={handleInputChange(setStartDate)}
+    />
+  </div>
+
+  <div className={styles.inputGroup}>
+    <label className={styles.label}>Lead Name</label>
+    <input
+      type="text"
+      placeholder="Enter lead name"
+      className={styles.input}
+      value={lead}
+      onChange={handleInputChange(setLead)}
+    />
+  </div>
+
+  <select className={styles.input} value={status} onChange={handleInputChange(setStatus)}>
+    <option value="ACTIVE">Active</option>
+    <option value="HOLD">Hold</option>
+    <option value="COMPLETED">Completed</option>
+  </select>
+</div>
+
 
       <h3>Roles Required</h3>
       <p className={styles.subtitle}>Define the positions you need to fill</p>
