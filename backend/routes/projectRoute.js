@@ -4,7 +4,9 @@ const path = require('path');
 const fs = require('fs');
 const passport = require('passport');
 const Project = require('../models/Project');
+const Candidate = require('../models/Candidate'); // Import your Candidate model
 const roleMiddleware = require('../middleware/roleMiddleware');
+
 
 const router = express.Router();
 
@@ -62,7 +64,7 @@ router.post(
 
 /**
  * @route GET /api/projects
- * @desc Get all projects
+ * @desc Get all projects with candidate stats
  * @access All Authenticated Users
  */
 router.get(
@@ -71,7 +73,35 @@ router.get(
   async (req, res) => {
     try {
       const projects = await Project.find();
-      res.json(projects);
+
+      // For each project, fetch candidate stats
+      const enrichedProjects = await Promise.all(
+        projects.map(async (project) => {
+          const candidates = await Candidate.find({ projectId: project._id });
+
+          // Count by pipeline stage
+          const pipeline = candidates.reduce((acc, cand) => {
+            const stage = cand.stage || 'Unassigned';
+            acc[stage] = (acc[stage] || 0) + 1;
+            return acc;
+          }, {});
+
+          return {
+            ...project.toObject(),
+            candidatesCount: candidates.length,
+            rolesRequested: project.roles?.length || 0,
+            totalPositions: project.roles?.reduce(
+              (sum, role) => sum + (role.count || 0),
+              0
+            ),
+            filledPositions: candidates.filter((c) => c.status === 'Hired')
+              .length,
+            pipeline,
+          };
+        })
+      );
+
+      res.json(enrichedProjects);
     } catch (error) {
       console.error('Error fetching projects:', error);
       res.status(500).json({ error: 'Failed to fetch projects' });

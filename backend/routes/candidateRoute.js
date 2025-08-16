@@ -189,5 +189,51 @@ router.put(
     }
   }
 );
+// ✅ Dashboard stats per project (All logged-in roles)
+router.get(
+  '/dashboard/:projectId',
+  passport.authenticate('jwt', { session: false }),
+  checkRole(['Admin', 'Project Initiator', 'Recruiter Lead', 'Recruiter']),
+  async (req, res) => {
+    const { projectId } = req.params;
+
+    try {
+      const candidates = await Candidate.find({ projectId });
+
+      // Progress = filled positions
+      const totalPositions = candidates.length;
+      const selectedCount = candidates.filter(c =>
+        c.feedback.some(fb => fb.status === 'PASSED' && fb.level === 'L2') // ✅ adjust if you have L3..L6
+      ).length;
+
+      // Build interview pipeline stats
+      const pipeline = {
+        L0: 0,
+        L1: 0,
+        L2: 0,
+        L3: 0,
+        L4: 0,
+        L5: 0,
+        L6: 0,
+        Selected: selectedCount
+      };
+
+      candidates.forEach(c => {
+        if (c.interviewLevel && pipeline[c.interviewLevel] !== undefined) {
+          pipeline[c.interviewLevel] += 1;
+        }
+      });
+
+      res.json({
+        totalPositions,
+        filledPositions: selectedCount,
+        pipeline
+      });
+    } catch (err) {
+      console.error('Error fetching dashboard stats:', err);
+      res.status(500).json({ error: 'Failed to fetch dashboard stats' });
+    }
+  }
+);
 
 module.exports = router;
