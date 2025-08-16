@@ -20,17 +20,30 @@ const Dashboard = () => {
   }, []);
 
   const fetchProjects = async () => {
-    try {
-      const res = await axios.get('http://localhost:5000/api/projects', {
-        headers: {
-          Authorization: `Bearer ${token}`
+  try {
+    const res = await axios.get("http://localhost:5000/api/projects", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    const projectsWithStats = await Promise.all(
+      res.data.map(async (project) => {
+        try {
+          const statsRes = await axios.get(
+            `http://localhost:5000/api/candidates/dashboard/${project._id}`,
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+          return { ...project, ...statsRes.data };
+        } catch {
+          return { ...project, pipeline: {}, totalPositions: 0, filledPositions: 0 };
         }
-      });
-      setProjects(res.data);
-    } catch (err) {
-      console.error('Error fetching projects:', err);
-    }
-  };
+      })
+    );
+
+    setProjects(projectsWithStats);
+  } catch (err) {
+    console.error("Error fetching projects:", err);
+  }
+};
 
   const fetchNotifications = async () => {
     setNotifications([
@@ -41,17 +54,13 @@ const Dashboard = () => {
   };
 
   const handleCreateProject = () => navigate('/create-project');
-  const handleProjectClick = (projectId) => navigate(`/project-review/${projectId}`);
+  const handleProjectClick = (projectId) =>
+    navigate(`/project-review/${projectId}`);
 
   const handleLogout = () => {
     toast.info('Logging out...', {
       position: 'top-center',
       autoClose: 1500,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: false,
-      draggable: true,
-      progress: undefined,
     });
 
     setTimeout(() => {
@@ -63,49 +72,70 @@ const Dashboard = () => {
   const renderProjectsByStatus = (status) =>
     projects
       .filter((project) => project.status === status)
-      .map((project) => {
-        const rolesRequested = project.roles?.length || 0;
-        const rolesClosed =
-          project.roles?.filter((role) => role.status === 'CLOSED')?.length || 0;
+      .map((project) => (
+        <div
+          key={project._id}
+          className={styles.projectBox}
+          onClick={() => handleProjectClick(project._id)}
+        >
+          {/* Project header */}
+          <div className={styles.projectHeader}>
+            <strong>{project.name}</strong>
+            <span
+              className={
+                project.status === 'ACTIVE'
+                  ? styles.statusActive
+                  : project.status === 'HOLD'
+                  ? styles.statusHold
+                  : styles.statusCompleted
+              }
+            >
+              {project.status === 'ACTIVE'
+                ? 'Open'
+                : project.status === 'HOLD'
+                ? 'On Hold'
+                : 'Completed'}
+            </span>
+          </div>
 
-        return (
-          <div
-            key={project._id}
-            className={styles.projectBox}
-            onClick={() => handleProjectClick(project._id)}
-          >
-            <div className={styles.projectHeader}>
-              <strong>{project.name}</strong>
-              <span
-                className={
-                  project.status === 'ACTIVE'
-                    ? styles.statusActive
-                    : project.status === 'HOLD'
-                    ? styles.statusHold
-                    : styles.statusCompleted
-                }
-              >
-                {project.status}
+          {/* Project details */}
+          <div className={styles.projectDetails}>
+            <p>
+              Roles:{' '}
+              <span className={styles.blueText}>
+                {project.rolesRequested || 0}
+              </span>{' '}
+              | Candidates:{' '}
+              <span className={styles.blueText}>
+                {project.candidatesCount || 0}
               </span>
-            </div>
-            <div className={styles.projectDetails}>
-              <p>
-                Roles Requested: <span className={styles.blueText}>{rolesRequested}</span>
-              </p>
-              <p>
-                Roles Closed: <span className={styles.greenText}>{rolesClosed}</span>
-              </p>
-              <p>
-                Lead: <span className={styles.boldText}>{project.lead || 'N/A'}</span>
-              </p>
+            </p>
+            <p>
+              Recruiter Lead:{' '}
+              <span className={styles.boldText}>{project.lead || 'N/A'}</span>
+            </p>
+            <p>
+              Progress: {project.filledPositions || 0}/
+              {project.totalPositions || 0} positions filled
+            </p>
+          </div>
+
+          {/* Interview Pipeline */}
+          <div className={styles.pipeline}>
+            <p>Interview Pipeline:</p>
+            <div className={styles.pipelineStages}>
+              {['L0','L1','L2','Selected'].map((stage) => (
+                <span key={stage} className={styles.pipelineStage}>
+                  {stage}: {project.pipeline?.[stage] || 0}
+                </span>
+              ))}
             </div>
           </div>
-        );
-      });
+        </div>
+      ));
 
   return (
     <div className={styles.dashboardPage}>
-      {/* Toastify container */}
       <ToastContainer />
 
       <Header
@@ -117,7 +147,10 @@ const Dashboard = () => {
       <div className={styles.dashboardWrapper}>
         <div className={styles.sidebar}>
           {['Admin', 'Project Initiator'].includes(role) && (
-            <button className={styles.createButton} onClick={handleCreateProject}>
+            <button
+              className={styles.createButton}
+              onClick={handleCreateProject}
+            >
               + Create Project
             </button>
           )}

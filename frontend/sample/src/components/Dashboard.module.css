@@ -172,3 +172,21 @@
   margin-top: 6px;
   padding-left: 20px;
 }
+.pipeline {
+  margin-top: 10px;
+}
+
+.pipelineStages {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.pipelineStage {
+  background: #eaf0ff;
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 13px;
+  color: #2a3f7f;
+  font-weight: 500;
+}
