@@ -17,6 +17,11 @@ const Dashboard = () => {
   useEffect(() => {
     fetchProjects();
     fetchNotifications();
+    
+    // Set up periodic refresh of notifications (every 30 seconds)
+    const notificationInterval = setInterval(fetchNotifications, 30000);
+    
+    return () => clearInterval(notificationInterval);
   }, []);
 
   const fetchProjects = async () => {
@@ -46,11 +51,31 @@ const Dashboard = () => {
 };
 
   const fetchNotifications = async () => {
-    setNotifications([
-      { id: 1, text: 'New project assigned: Alpha' },
-      { id: 2, text: 'Role closed in Beta project' },
-      { id: 3, text: 'System maintenance at 10PM' },
-    ]);
+    try {
+      const res = await axios.get("http://localhost:5000/api/notifications", {
+        headers: { Authorization: `Bearer ${token}` },
+        params: { limit: 10, unreadOnly: false }
+      });
+      
+      // Transform notifications to match the expected format
+      const transformedNotifications = res.data.map(notification => ({
+        id: notification._id,
+        text: notification.message,
+        title: notification.title,
+        type: notification.type,
+        priority: notification.priority,
+        isRead: notification.isRead,
+        createdAt: notification.createdAt,
+        projectId: notification.projectId?._id,
+        projectName: notification.projectId?.projectName
+      }));
+      
+      setNotifications(transformedNotifications);
+    } catch (err) {
+      console.error("Error fetching notifications:", err);
+      // Fallback to empty notifications if API fails
+      setNotifications([]);
+    }
   };
 
   const handleCreateProject = () => navigate('/create-project');
@@ -67,6 +92,21 @@ const Dashboard = () => {
       localStorage.clear();
       navigate('/');
     }, 1000);
+  };
+
+  const markAllNotificationsAsRead = async () => {
+    try {
+      await axios.patch("http://localhost:5000/api/notifications/read-all", {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      // Update local state
+      setNotifications(prev => prev.map(note => ({ ...note, isRead: true })));
+      toast.success('All notifications marked as read');
+    } catch (err) {
+      console.error("Error marking notifications as read:", err);
+      toast.error('Failed to mark notifications as read');
+    }
   };
 
   const renderProjectsByStatus = (status) =>
@@ -91,9 +131,9 @@ const Dashboard = () => {
               }
             >
               {project.status === 'ACTIVE'
-                ? 'Open'
+                ? 'ACTIVE'
                 : project.status === 'HOLD'
-                ? 'On Hold'
+                ? 'ON HOLD'
                 : 'Completed'}
             </span>
           </div>
@@ -142,6 +182,7 @@ const Dashboard = () => {
         username={username}
         notifications={notifications}
         handleLogout={handleLogout}
+        onMarkAllAsRead={markAllNotificationsAsRead}
       />
 
       <div className={styles.dashboardWrapper}>
