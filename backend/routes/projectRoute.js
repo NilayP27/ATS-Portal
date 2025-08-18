@@ -6,6 +6,7 @@ const passport = require('passport');
 const Project = require('../models/Project');
 const Candidate = require('../models/Candidate'); // Import your Candidate model
 const roleMiddleware = require('../middleware/roleMiddleware');
+const NotificationService = require('../utils/notificationService');
 
 
 const router = express.Router();
@@ -54,6 +55,15 @@ router.post(
       });
 
       await project.save();
+      
+      // Create notification for project creation
+      try {
+        await NotificationService.notifyProjectCreated(project, req.user._id);
+      } catch (notificationError) {
+        console.error('Error creating notification:', notificationError);
+        // Don't fail the request if notification fails
+      }
+      
       res.status(201).json({ message: 'Project created successfully', project });
     } catch (error) {
       console.error('Error creating project:', error);

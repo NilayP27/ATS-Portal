@@ -1,39 +1,101 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const Candidate = require('../models/Candidate');
-const passport = require('passport');
-const { checkRole } = require('../middleware/roleMiddleware'); // ✅ New middleware
+const express = require("express");
+const mongoose = require("mongoose");
+const Candidate = require("../models/Candidate");
+const Project = require("../models/Project");
+const passport = require("passport");
+const { checkRole } = require("../middleware/roleMiddleware");
+const NotificationService = require("../utils/notificationService");
+const multer = require("multer");
+const path = require("path");
+const fs = require("fs");
 
 const router = express.Router();
 
-// ✅ Add Candidate (Admin, Recruiter Lead)
+// ------------------ Multer Setup ------------------
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    const uploadPath = path.join(__dirname, "../uploads/resumes");
+    fs.mkdirSync(uploadPath, { recursive: true }); // ensure folder exists
+    cb(null, uploadPath);
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + path.extname(file.originalname)); // unique name
+  },
+});
+const upload = multer({ storage });
+
+// ------------------ Routes ------------------
+
+/**
+ * @route   POST /api/candidates
+ * @desc    Add a new candidate (Admin, Recruiter Lead)
+ */
 router.post(
   '/',
   passport.authenticate('jwt', { session: false }),
   checkRole(['Admin', 'Recruiter Lead']),
+  upload.single('resume'),
   async (req, res) => {
     try {
-      const candidate = new Candidate(req.body);
+      const { projectId, roleTitle, name, email, phone, interviewLevel } = req.body;
+
+      if (!projectId || !roleTitle || !name || !email) {
+        return res.status(400).json({ message: 'Missing required fields' });
+      }
+
+      const project = await Project.findById(projectId);
+      if (!project) {
+        return res.status(404).json({ message: 'Project not found' });
+      }
+
+      const role = project.roles.find((r) => r.title === roleTitle);
+      if (!role) {
+        return res.status(400).json({ message: 'Role not found for this project' });
+      }
+
+      const resumePath = req.file ? `/uploads/resumes/${req.file.filename}` : undefined;
+
+      const candidate = new Candidate({
+        projectId,
+        roleId: role._id,
+        roleTitle,
+        name,
+        email,
+        phone,
+        resumePath,
+        interviewLevel: interviewLevel || undefined,
+        createdBy: req.user._id,
+      });
+
       await candidate.save();
-      res.status(201).json({ message: 'Candidate added successfully', candidate });
-    } catch (err) {
-      console.error('Error adding candidate:', err);
-      res.status(500).json({ error: 'Failed to add candidate' });
+      return res.status(201).json(candidate);
+    } catch (error) {
+      console.error('❌ Error adding candidate:', error);
+      return res.status(500).json({ message: 'Server error', error: error.message });
     }
   }
 );
 
-// ✅ Project Overview (All logged-in roles)
+
+
+/**
+ * @route   GET /api/candidates/:projectId/overview
+ * @desc    Project overview stats
+ */
 router.get(
-  '/:projectId/overview',
-  passport.authenticate('jwt', { session: false }),
-  checkRole(['Admin', 'Project Initiator', 'Recruiter Lead', 'Recruiter']),
+  "/:projectId/overview",
+  passport.authenticate("jwt", { session: false }),
+  checkRole(["Admin", "Project Initiator", "Recruiter Lead", "Recruiter"]),
   async (req, res) => {
     const { projectId } = req.params;
     try {
       const candidates = await Candidate.find({ projectId });
 
-      const interviewStats = { L0: { passed: 0, pending: 0, rejected: 0 }, L1: { passed: 0, pending: 0, rejected: 0 }, L2: { passed: 0, pending: 0, rejected: 0 } };
+      const interviewStats = {
+        L0: { passed: 0, pending: 0, rejected: 0 },
+        L1: { passed: 0, pending: 0, rejected: 0 },
+        L2: { passed: 0, pending: 0, rejected: 0 },
+      };
       const currentLevelStats = { L0: 0, L1: 0, L2: 0 };
       const roleStatsMap = {};
 
@@ -55,14 +117,17 @@ router.get(
         feedback.forEach((fb) => {
           const { level, status } = fb;
           const lowerStatus = status?.toLowerCase();
-          if (interviewStats[level] && interviewStats[level][lowerStatus] !== undefined) {
+          if (
+            interviewStats[level] &&
+            interviewStats[level][lowerStatus] !== undefined
+          ) {
             interviewStats[level][lowerStatus] += 1;
           }
-          if (status === 'REJECTED') hasRejected = true;
+          if (status === "REJECTED") hasRejected = true;
         });
 
-        const passedAll = ['L0', 'L1', 'L2'].every((level) =>
-          feedback.find((fb) => fb.level === level && fb.status === 'PASSED')
+        const passedAll = ["L0", "L1", "L2"].every((level) =>
+          feedback.find((fb) => fb.level === level && fb.status === "PASSED")
         );
 
         if (passedAll) roleStatsMap[roleTitle].selected += 1;
@@ -78,33 +143,41 @@ router.get(
 
       res.json({ interviewStats, currentLevelStats, roles: roleStats });
     } catch (err) {
-      console.error('Error fetching project overview:', err);
-      res.status(500).json({ error: 'Failed to fetch candidate stats' });
+      console.error("Error fetching project overview:", err);
+      res.status(500).json({ error: "Failed to fetch candidate stats" });
     }
   }
 );
 
-// ✅ Get candidates by project (All logged-in roles)
+/**
+ * @route   GET /api/candidates/:projectId
+ * @desc    Get candidates by project
+ */
 router.get(
-  '/:projectId',
-  passport.authenticate('jwt', { session: false }),
-  checkRole(['Admin', 'Project Initiator', 'Recruiter Lead', 'Recruiter']),
+  "/:projectId",
+  passport.authenticate("jwt", { session: false }),
+  checkRole(["Admin", "Project Initiator", "Recruiter Lead", "Recruiter"]),
   async (req, res) => {
     try {
-      const candidates = await Candidate.find({ projectId: req.params.projectId });
+      const candidates = await Candidate.find({
+        projectId: req.params.projectId,
+      });
       res.json(candidates);
     } catch (err) {
-      console.error('Error fetching candidates:', err);
-      res.status(500).json({ error: 'Failed to fetch candidates' });
+      console.error("Error fetching candidates:", err);
+      res.status(500).json({ error: "Failed to fetch candidates" });
     }
   }
 );
 
-// ✅ Get candidates by project + role (All logged-in roles)
+/**
+ * @route   GET /api/candidates/by-project-role/:projectId/:roleTitle
+ * @desc    Get candidates by project + role
+ */
 router.get(
-  '/by-project-role/:projectId/:roleTitle',
-  passport.authenticate('jwt', { session: false }),
-  checkRole(['Admin', 'Project Initiator', 'Recruiter Lead', 'Recruiter']),
+  "/by-project-role/:projectId/:roleTitle",
+  passport.authenticate("jwt", { session: false }),
+  checkRole(["Admin", "Project Initiator", "Recruiter Lead", "Recruiter"]),
   async (req, res) => {
     const { projectId, roleTitle } = req.params;
     try {
@@ -114,67 +187,84 @@ router.get(
       });
       res.json(candidates);
     } catch (error) {
-      console.error('Error fetching candidates by project and role:', error);
-      res.status(500).json({ error: 'Failed to fetch candidates' });
+      console.error("Error fetching candidates by project and role:", error);
+      res.status(500).json({ error: "Failed to fetch candidates" });
     }
   }
 );
 
-// ✅ Update interview level (Admin, Recruiter Lead)
+/**
+ * @route   PUT /api/candidates/:id/interview-level
+ * @desc    Update interview level
+ */
 router.put(
-  '/:id/interview-level',
-  passport.authenticate('jwt', { session: false }),
-  checkRole(['Admin', 'Recruiter Lead']),
+  "/:id/interview-level",
+  passport.authenticate("jwt", { session: false }),
+  checkRole(["Admin", "Recruiter Lead"]),
   async (req, res) => {
     const { id } = req.params;
     const { interviewLevel } = req.body;
 
     try {
-      const updated = await Candidate.findByIdAndUpdate(id, { interviewLevel }, { new: true });
+      const updated = await Candidate.findByIdAndUpdate(
+        id,
+        { interviewLevel },
+        { new: true }
+      );
       res.json(updated);
     } catch (err) {
-      console.error('Error updating interview level:', err);
-      res.status(500).json({ error: 'Failed to update interview level' });
+      console.error("Error updating interview level:", err);
+      res.status(500).json({ error: "Failed to update interview level" });
     }
   }
 );
 
-// ✅ Get candidate by ID (All logged-in roles)
+/**
+ * @route   GET /api/candidates/by-id/:id
+ * @desc    Get candidate by ID
+ */
 router.get(
-  '/by-id/:id',
-  passport.authenticate('jwt', { session: false }),
-  checkRole(['Admin', 'Project Initiator', 'Recruiter Lead', 'Recruiter']),
+  "/by-id/:id",
+  passport.authenticate("jwt", { session: false }),
+  checkRole(["Admin", "Project Initiator", "Recruiter Lead", "Recruiter"]),
   async (req, res) => {
     const { id } = req.params;
     try {
       const candidate = await Candidate.findById(id);
-      if (!candidate) return res.status(404).json({ message: 'Candidate not found' });
+      if (!candidate)
+        return res.status(404).json({ message: "Candidate not found" });
       res.json(candidate);
     } catch (err) {
-      console.error('Error fetching candidate by ID:', err);
-      res.status(500).json({ message: 'Server error' });
+      console.error("Error fetching candidate by ID:", err);
+      res.status(500).json({ message: "Server error" });
     }
   }
 );
 
-// ✅ Save feedback (Recruiter, Recruiter Lead, Admin)
+/**
+ * @route   PUT /api/candidates/:id/feedback
+ * @desc    Save feedback
+ */
 router.put(
-  '/:id/feedback',
-  passport.authenticate('jwt', { session: false }),
-  checkRole(['Admin', 'Recruiter Lead', 'Recruiter']),
+  "/:id/feedback",
+  passport.authenticate("jwt", { session: false }),
+  checkRole(["Admin", "Recruiter Lead", "Recruiter"]),
   async (req, res) => {
     const { id } = req.params;
     const { level, comment, status } = req.body;
 
     if (!level || !comment || !status) {
-      return res.status(400).json({ error: 'Missing feedback fields' });
+      return res.status(400).json({ error: "Missing feedback fields" });
     }
 
     try {
       const candidate = await Candidate.findById(id);
-      if (!candidate) return res.status(404).json({ error: 'Candidate not found' });
+      if (!candidate)
+        return res.status(404).json({ error: "Candidate not found" });
 
-      const existingIndex = candidate.feedback.findIndex(fb => fb.level === level);
+      const existingIndex = candidate.feedback.findIndex(
+        (fb) => fb.level === level
+      );
       if (existingIndex !== -1) {
         candidate.feedback[existingIndex] = { level, comment, status };
       } else {
@@ -182,31 +272,36 @@ router.put(
       }
 
       await candidate.save();
-      res.json({ message: 'Feedback saved successfully', feedback: candidate.feedback });
+      res.json({
+        message: "Feedback saved successfully",
+        feedback: candidate.feedback,
+      });
     } catch (err) {
-      console.error('Error saving feedback:', err);
-      res.status(500).json({ error: 'Failed to save feedback' });
+      console.error("Error saving feedback:", err);
+      res.status(500).json({ error: "Failed to save feedback" });
     }
   }
 );
-// ✅ Dashboard stats per project (All logged-in roles)
+
+/**
+ * @route   GET /api/candidates/dashboard/:projectId
+ * @desc    Dashboard stats per project
+ */
 router.get(
-  '/dashboard/:projectId',
-  passport.authenticate('jwt', { session: false }),
-  checkRole(['Admin', 'Project Initiator', 'Recruiter Lead', 'Recruiter']),
+  "/dashboard/:projectId",
+  passport.authenticate("jwt", { session: false }),
+  checkRole(["Admin", "Project Initiator", "Recruiter Lead", "Recruiter"]),
   async (req, res) => {
     const { projectId } = req.params;
 
     try {
       const candidates = await Candidate.find({ projectId });
 
-      // Progress = filled positions
       const totalPositions = candidates.length;
-      const selectedCount = candidates.filter(c =>
-        c.feedback.some(fb => fb.status === 'PASSED' && fb.level === 'L2') // ✅ adjust if you have L3..L6
+      const selectedCount = candidates.filter((c) =>
+        c.feedback.some((fb) => fb.status === "PASSED" && fb.level === "L2")
       ).length;
 
-      // Build interview pipeline stats
       const pipeline = {
         L0: 0,
         L1: 0,
@@ -215,10 +310,10 @@ router.get(
         L4: 0,
         L5: 0,
         L6: 0,
-        Selected: selectedCount
+        Selected: selectedCount,
       };
 
-      candidates.forEach(c => {
+      candidates.forEach((c) => {
         if (c.interviewLevel && pipeline[c.interviewLevel] !== undefined) {
           pipeline[c.interviewLevel] += 1;
         }
@@ -227,11 +322,11 @@ router.get(
       res.json({
         totalPositions,
         filledPositions: selectedCount,
-        pipeline
+        pipeline,
       });
     } catch (err) {
-      console.error('Error fetching dashboard stats:', err);
-      res.status(500).json({ error: 'Failed to fetch dashboard stats' });
+      console.error("Error fetching dashboard stats:", err);
+      res.status(500).json({ error: "Failed to fetch dashboard stats" });
     }
   }
 );

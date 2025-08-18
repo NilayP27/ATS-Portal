@@ -32,10 +32,21 @@ const candidateSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  name: String,
-  email: String,
-  phone: String,
-  resumeLink: String,
+  name: {
+    type: String,
+    required: true, // ✅ safer: name must exist
+  },
+  email: {
+    type: String,
+    required: true, // ✅ safer: email must exist
+  },
+  phone: {
+    type: String,
+  },
+  resumePath: {
+    type: String, // stores file path
+    required: false,
+  },
   interviewLevel: {
     type: String,
     enum: ['L0', 'L1', 'L2'],
@@ -50,6 +61,11 @@ const candidateSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now,
+  },
+  createdBy: { 
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true // ✅ ensure candidate always has creator
   }
 });
 
