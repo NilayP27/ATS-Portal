@@ -1,11 +1,11 @@
 // Define allowed actions for each role based on your doc
 const permissions = {
   "Project Initiator": ["create_project", "edit_project", "delete_project"],
-  "Recruiter Lead": ["assign_recruiters", "manage_candidates", "schedule_interviews"],
-  "Recruiter": ["manage_candidates", "schedule_interviews"],
+  "Recruiter Lead": ["assign_recruiters", "manage_candidates"],
+  "Recruiter": ["manage_candidates"],
   "Admin": [
     "create_project", "edit_project", "delete_project",
-    "assign_recruiters", "manage_candidates", "schedule_interviews"
+    "assign_recruiters", "manage_candidates"
   ]
 };
 

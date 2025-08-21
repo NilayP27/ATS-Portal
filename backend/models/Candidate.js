@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const feedbackSchema = new mongoose.Schema({
   level: {
     type: String,
-    enum: ['L0', 'L1', 'L2'],
+    enum: ['L1', 'L2', 'L3', 'L4', 'L5', 'L6'],
     required: true,
   },
   comment: {
@@ -49,8 +49,8 @@ const candidateSchema = new mongoose.Schema({
   },
   interviewLevel: {
     type: String,
-    enum: ['L0', 'L1', 'L2'],
-    default: 'L0',
+    enum: ['L1', 'L2', 'L3', 'L4', 'L5', 'L6'],
+    default: 'L1',
   },
   interviewStatus: {
     type: String,

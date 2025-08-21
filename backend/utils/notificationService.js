@@ -52,25 +52,7 @@ class NotificationService {
     }
   }
 
-  /**
-   * Create notification when interview is completed
-   */
-  static async notifyInterviewCompleted(candidate, project, level, status, userId) {
-    try {
-      const statusText = status === 'PASSED' ? 'passed' : 'failed';
-      await this.createNotification({
-        type: 'INTERVIEW_COMPLETED',
-        title: 'Interview Completed',
-        message: `Candidate "${candidate.name}" ${statusText} ${level} interview for project "${project.projectName}"`,
-        userId: userId,
-        projectId: project._id,
-        candidateId: candidate._id,
-        priority: status === 'PASSED' ? 'MEDIUM' : 'LOW'
-      });
-    } catch (error) {
-      console.error('Error creating interview notification:', error);
-    }
-  }
+
 
   /**
    * Create notification when project status changes

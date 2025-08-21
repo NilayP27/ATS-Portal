@@ -92,11 +92,14 @@ router.get(
       const candidates = await Candidate.find({ projectId });
 
       const interviewStats = {
-        L0: { passed: 0, pending: 0, rejected: 0 },
         L1: { passed: 0, pending: 0, rejected: 0 },
         L2: { passed: 0, pending: 0, rejected: 0 },
+        L3: { passed: 0, pending: 0, rejected: 0 },
+        L4: { passed: 0, pending: 0, rejected: 0 },
+        L5: { passed: 0, pending: 0, rejected: 0 },
+        L6: { passed: 0, pending: 0, rejected: 0 },
       };
-      const currentLevelStats = { L0: 0, L1: 0, L2: 0 };
+      const currentLevelStats = { L1: 0, L2: 0, L3: 0, L4: 0, L5: 0, L6: 0 };
       const roleStatsMap = {};
 
       candidates.forEach((candidate) => {
@@ -126,7 +129,7 @@ router.get(
           if (status === "REJECTED") hasRejected = true;
         });
 
-        const passedAll = ["L0", "L1", "L2"].every((level) =>
+        const passedAll = ["L1", "L2", "L3", "L4", "L5", "L6"].every((level) =>
           feedback.find((fb) => fb.level === level && fb.status === "PASSED")
         );
 
@@ -299,11 +302,10 @@ router.get(
 
       const totalPositions = candidates.length;
       const selectedCount = candidates.filter((c) =>
-        c.feedback.some((fb) => fb.status === "PASSED" && fb.level === "L2")
+        c.feedback.some((fb) => fb.status === "PASSED" && fb.level === "L6")
       ).length;
 
       const pipeline = {
-        L0: 0,
         L1: 0,
         L2: 0,
         L3: 0,
