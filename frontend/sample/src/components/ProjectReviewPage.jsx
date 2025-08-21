@@ -159,7 +159,7 @@ const ProjectOverview = () => {
                 flexWrap: "wrap",
               }}
             >
-              {["L0", "L1", "L2"].map((level) => {
+              {["L1", "L2", "L3", "L4", "L5", "L6"].map((level) => {
                 const feedbackStats = interviewStats[level] || {
                   passed: 0,
                   pending: 0,

@@ -96,14 +96,14 @@ const InterviewFeedback = () => {
 
   const addFeedback = () => {
     const usedLevels = feedbackList.map((f) => f.level).filter(Boolean);
-    const possibleLevels = ["L0", "L1", "L2"];
+    const possibleLevels = ["L1", "L2", "L3", "L4", "L5", "L6"];
 
     const nextAvailable = possibleLevels.find(
       (lvl) => !usedLevels.includes(lvl)
     );
 
     if (!nextAvailable) {
-      toast.warn("All feedback levels (L0, L1, L2) are already used.");
+      toast.warn("All feedback levels (L1, L2, L3, L4, L5, L6) are already used.");
       return;
     }
 

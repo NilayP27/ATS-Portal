@@ -70,10 +70,10 @@ const ProfileEdit = () => {
           <input type="text" name="phone" value={formData.phone} onChange={handleChange} />
         </label>
 
-        <label>
+        {/* <label>
           Department:
           <input type="text" name="department" value={formData.department} onChange={handleChange} />
-        </label>
+        </label> */}
 
         <button type="submit">Save Changes</button>
       </form>

@@ -165,7 +165,7 @@ const Dashboard = () => {
           <div className={styles.pipeline}>
             <p>Interview Pipeline:</p>
             <div className={styles.pipelineStages}>
-              {['L0','L1','L2','Selected'].map((stage) => (
+              {['L1','L2','L3','L4','L5','L6','Selected'].map((stage) => (
                 <span key={stage} className={styles.pipelineStage}>
                   {stage}: {project.pipeline?.[stage] || 0}
                 </span>

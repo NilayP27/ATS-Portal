@@ -15,7 +15,7 @@ const CandidateList = () => {
     name: "",
     email: "",
     phone: "",
-    interviewLevel: "L0",
+    interviewLevel: "L1",
     resume: null,
   });
 
@@ -117,7 +117,7 @@ const CandidateList = () => {
         name: "",
         email: "",
         phone: "",
-        interviewLevel: "L0",
+        interviewLevel: "L1",
         resume: null,
       });
       setShowForm(false);
@@ -206,9 +206,12 @@ const CandidateList = () => {
                 value={newCandidate.interviewLevel}
                 onChange={handleInputChange}
               >
-                <option value="L0">L0</option>
-                <option value="L1">L1</option>
-                <option value="L2">L2</option>
+                <option value="L1">L1 - Technical Assessment/First Round</option>
+                <option value="L2">L2 - Technical Interview/Second Round</option>
+                <option value="L3">L3 - System Design/Architecture Round</option>
+                <option value="L4">L4 - Managerial/Leadership Interview</option>
+                <option value="L5">L5 - Cultural Fit/HR Interview</option>
+                <option value="L6">L6 - Final Interview/Director Level</option>
               </select>
 
               <label
@@ -276,9 +279,12 @@ const CandidateList = () => {
                   }
                   style={{ padding: "6px 12px", borderRadius: "6px" }}
                 >
-                  <option value="L0">L0</option>
-                  <option value="L1">L1</option>
-                  <option value="L2">L2</option>
+                  <option value="L1">L1 - Technical Assessment/First Round</option>
+                  <option value="L2">L2 - Technical Interview/Second Round</option>
+                  <option value="L3">L3 - System Design/Architecture Round</option>
+                  <option value="L4">L4 - Managerial/Leadership Interview</option>
+                  <option value="L5">L5 - Cultural Fit/HR Interview</option>
+                  <option value="L6">L6 - Final Interview/Director Level</option>
                 </select>
               )}
             </div>
