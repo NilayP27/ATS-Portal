@@ -121,16 +121,12 @@ const CandidateList = () => {
         resume: null,
       });
       setShowForm(false);
-
-      // ✅ Toast success
       toast.success("Candidate added successfully!");
     } catch (error) {
       console.error(
         "Error adding candidate:",
         error.response?.data || error.message
       );
-
-      // ✅ Toast error
       toast.error(
         `Failed to add candidate: ${
           error.response?.data?.message || error.message
@@ -145,7 +141,6 @@ const CandidateList = () => {
 
   return (
     <div className="page-container">
-      {/* Toast container */}
       <ToastContainer position="top-right" autoClose={3000} />
 
       <div className="header">
@@ -161,7 +156,6 @@ const CandidateList = () => {
         </div>
       </div>
 
-      {/* New Candidate Button */}
       <div style={{ marginBottom: "20px" }}>
         <button
           onClick={() => setShowForm(true)}
@@ -178,7 +172,6 @@ const CandidateList = () => {
         </button>
       </div>
 
-      {/* Popup Modal Form */}
       {showForm && (
         <div className="modal-overlay">
           <div className="modal-content">

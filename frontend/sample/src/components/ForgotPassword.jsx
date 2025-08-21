@@ -27,7 +27,7 @@ const ForgotPassword = () => {
           navigate('/reset-password', { state: { email } });
         }, 1000);
       } else {
-        toast.error(data.message || '❌ Failed to send reset code');
+        toast.error(data.message || ' Failed to send reset code');
       }
     } catch (e) {
       toast.error('⚠️ An error occurred. Please try again.');

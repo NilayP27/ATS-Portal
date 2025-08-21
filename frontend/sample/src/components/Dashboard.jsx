@@ -17,38 +17,37 @@ const Dashboard = () => {
   useEffect(() => {
     fetchProjects();
     fetchNotifications();
-    
-    // Set up periodic refresh of notifications (every 30 seconds)
+
+    // Refresh notifications every 30s
     const notificationInterval = setInterval(fetchNotifications, 30000);
-    
     return () => clearInterval(notificationInterval);
   }, []);
 
   const fetchProjects = async () => {
-  try {
-    const res = await axios.get("http://localhost:5000/api/projects", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    try {
+      const res = await axios.get("http://localhost:5000/api/projects", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-    const projectsWithStats = await Promise.all(
-      res.data.map(async (project) => {
-        try {
-          const statsRes = await axios.get(
-            `http://localhost:5000/api/candidates/dashboard/${project._id}`,
-            { headers: { Authorization: `Bearer ${token}` } }
-          );
-          return { ...project, ...statsRes.data };
-        } catch {
-          return { ...project, pipeline: {}, totalPositions: 0, filledPositions: 0 };
-        }
-      })
-    );
+      const projectsWithStats = await Promise.all(
+        res.data.map(async (project) => {
+          try {
+            const statsRes = await axios.get(
+              `http://localhost:5000/api/candidates/dashboard/${project._id}`,
+              { headers: { Authorization: `Bearer ${token}` } }
+            );
+            return { ...project, ...statsRes.data };
+          } catch {
+            return { ...project, pipeline: {}, totalPositions: 0, filledPositions: 0 };
+          }
+        })
+      );
 
-    setProjects(projectsWithStats);
-  } catch (err) {
-    console.error("Error fetching projects:", err);
-  }
-};
+      setProjects(projectsWithStats);
+    } catch (err) {
+      console.error("Error fetching projects:", err);
+    }
+  };
 
   const fetchNotifications = async () => {
     try {
@@ -56,8 +55,7 @@ const Dashboard = () => {
         headers: { Authorization: `Bearer ${token}` },
         params: { limit: 10, unreadOnly: false }
       });
-      
-      // Transform notifications to match the expected format
+
       const transformedNotifications = res.data.map(notification => ({
         id: notification._id,
         text: notification.message,
@@ -69,11 +67,10 @@ const Dashboard = () => {
         projectId: notification.projectId?._id,
         projectName: notification.projectId?.projectName
       }));
-      
+
       setNotifications(transformedNotifications);
     } catch (err) {
       console.error("Error fetching notifications:", err);
-      // Fallback to empty notifications if API fails
       setNotifications([]);
     }
   };
@@ -99,8 +96,7 @@ const Dashboard = () => {
       await axios.patch("http://localhost:5000/api/notifications/read-all", {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      
-      // Update local state
+
       setNotifications(prev => prev.map(note => ({ ...note, isRead: true })));
       toast.success('All notifications marked as read');
     } catch (err) {
@@ -116,11 +112,26 @@ const Dashboard = () => {
         <div
           key={project._id}
           className={styles.projectBox}
+          style={{ position: 'relative', cursor: 'pointer' }}
           onClick={() => handleProjectClick(project._id)}
         >
-          {/* Project header */}
-          <div className={styles.projectHeader}>
+          {/* Project Name */}
+          <div className={styles.projectTitle}>
             <strong>{project.name}</strong>
+          </div>
+
+          {/* Roles & Candidates + Status in same row */}
+          <div className={styles.projectInfoRow}>
+            <p>
+              Roles:{' '}
+              <span className={styles.blueText}>
+                {project.rolesRequested || 0}
+              </span>{' '}
+              | Candidates:{' '}
+              <span className={styles.blueText}>
+                {project.candidatesCount || 0}
+              </span>
+            </p>
             <span
               className={
                 project.status === 'ACTIVE'
@@ -138,18 +149,8 @@ const Dashboard = () => {
             </span>
           </div>
 
-          {/* Project details */}
+          {/* Recruiter + Progress */}
           <div className={styles.projectDetails}>
-            <p>
-              Roles:{' '}
-              <span className={styles.blueText}>
-                {project.rolesRequested || 0}
-              </span>{' '}
-              | Candidates:{' '}
-              <span className={styles.blueText}>
-                {project.candidatesCount || 0}
-              </span>
-            </p>
             <p>
               Recruiter Lead:{' '}
               <span className={styles.boldText}>{project.lead || 'N/A'}</span>

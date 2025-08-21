@@ -190,3 +190,17 @@
   color: #2a3f7f;
   font-weight: 500;
 }
+.projectInfoRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center; /* ✅ aligns vertically with text */
+  margin-bottom: 6px;
+}
+
+.projectInfoRow p {
+  margin: 0; /* remove default spacing */
+}
+
+.projectTitle {
+  margin-bottom: 4px;
+}

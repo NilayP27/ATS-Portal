@@ -24,13 +24,13 @@ const ResetPassword = () => {
       const data = await res.json();
 
       if (res.ok) {
-        toast.success('✅ Password has been reset!');
+        toast.success(' Password has been reset!');
         setTimeout(() => navigate('/'), 1000);
       } else {
         toast.error(data.message || '❌ Invalid or expired reset code');
       }
     } catch (error) {
-      toast.error('⚠️ An error occurred. Please try again.');
+      toast.error(' An error occurred. Please try again.');
       console.error('Reset password error:', error);
     }
   };

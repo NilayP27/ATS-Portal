@@ -13,14 +13,11 @@ const InterviewFeedback = () => {
   const [feedbackList, setFeedbackList] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // ✅ Get token and role from localStorage
   const token = localStorage.getItem("token") || "";
   const role = localStorage.getItem("role") || "";
 
-  // ✅ Roles allowed to edit
   const canEditFeedback = ["Admin", "Recruiter Lead", "Recruiter"].includes(role);
 
-  // ✅ API: Fetch candidate with Authorization header
   const fetchCandidate = async () => {
     try {
       const res = await axios.get(
@@ -48,7 +45,6 @@ const InterviewFeedback = () => {
 
   useEffect(() => {
     fetchCandidate();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   const getStatusClass = (status) => {
@@ -69,7 +65,6 @@ const InterviewFeedback = () => {
     setFeedbackList(updated);
   };
 
-  // ✅ Save feedback with Authorization header
   const handleSave = async (index) => {
     const item = feedbackList[index];
 

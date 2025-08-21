@@ -11,10 +11,14 @@ import ResetPassword from "./components/ResetPassword";
 import Dashboard from "./components/Dashboard";
 import CreateProject from "./components/CreateProject";
 import ProjectOverview from "./components/ProjectReviewPage";
+import EditProject from "./components/EditProject";
 
 // Candidate-related components
 import CandidateList from "./components/Candidate"; // Shows candidates for a role
 import InterviewFeedback from "./components/InterviewFeedback"; // Candidate's feedback form/view
+
+// Profile
+import ProfileEdit from "./components/ProfileEdit";
 
 function App() {
   return (
@@ -30,13 +34,14 @@ function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/create-project" element={<CreateProject />} />
         <Route path="/project-review/:projectId" element={<ProjectOverview />} />
-        
+        <Route path="/edit-project/:projectId" element={<EditProject />} />
 
         {/* Candidate Routes */}
         <Route path="/candidates/:projectId/:roleTitle" element={<CandidateList />} />
         <Route path="/candidate-feedback/:id" element={<InterviewFeedback />} />
 
-        
+        {/* Profile Route */}
+        <Route path="/profile/edit" element={<ProfileEdit />} />
       </Routes>
     </Router>
   );

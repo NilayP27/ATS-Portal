@@ -75,7 +75,6 @@ const LoginForm = () => {
             className="input-field"
           />
 
-          {/* ✅ Centered show/hide toggle */}
           <p
             className="show-password-toggle"
             onClick={() => setShowPassword(!showPassword)}

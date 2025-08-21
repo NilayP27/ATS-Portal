@@ -1,0 +1,64 @@
+.profileEditContainer {
+  max-width: 600px;
+  margin: 50px auto;
+  padding: 30px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0px 6px 20px rgba(0,0,0,0.1);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.profileEditContainer h2 {
+  text-align: center;
+  margin-bottom: 25px;
+  font-size: 24px;
+  font-weight: 600;
+  color: #222;
+}
+
+.profileForm {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.profileForm label {
+  font-weight: 500;
+  color: #444;
+  margin-bottom: 5px;
+}
+
+.profileForm input {
+  padding: 12px 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 15px;
+  transition: all 0.3s ease;
+}
+
+.profileForm input:focus {
+  border-color: #007bff;
+  outline: none;
+  box-shadow: 0px 0px 6px rgba(0,123,255,0.3);
+}
+
+.profileForm button {
+  background: linear-gradient(90deg, #007bff, #0056b3);
+  color: white;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.profileForm button:hover {
+  background: linear-gradient(90deg, #0056b3, #00408f);
+  transform: translateY(-2px);
+}
+
+.profileForm button:active {
+  transform: translateY(0);
+}

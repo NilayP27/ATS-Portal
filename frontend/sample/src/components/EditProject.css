@@ -1,0 +1,141 @@
+.edit-project-container {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.back-button-container {
+  margin-bottom: 2rem;
+}
+
+.back-button {
+  background: none;
+  border: none;
+  color: #4d4dff;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.subtext {
+  color: #666;
+  margin-bottom: 2rem;
+}
+
+.action-buttons {
+  margin-bottom: 2rem;
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.btn {
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  border: none;
+  color: white;
+}
+
+.edit-btn {
+  background: linear-gradient(to right, #4d4dff, #706cff);
+}
+
+.add-btn {
+  background: linear-gradient(to right, #28a745, #20c997);
+}
+
+.delete-btn {
+  background: linear-gradient(to right, #dc3545, #c82333);
+}
+
+.cancel-btn {
+  background: white;
+  border: 1px solid #ddd;
+  color: black;
+}
+
+.loading {
+  padding: 2rem;
+  text-align: center;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  max-width: 600px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.form-grid {
+  display: grid;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.form-grid input,
+.form-grid select {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+
+.roles-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.role-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  border: 1px solid #e5e7eb;
+}
+
+.role-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.role-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn.small {
+  padding: 4px 8px;
+  font-size: 12px;
+  border-radius: 4px;
+}
+
+.role-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
