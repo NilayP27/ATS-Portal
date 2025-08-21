@@ -169,6 +169,141 @@ router.put(
 );
 
 /**
+ * @route PUT /api/projects/:projectId/roles
+ * @desc Add a new role to an existing project
+ * @access Project Initiator, Admin
+ */
+router.put(
+  '/:projectId/roles',
+  passport.authenticate('jwt', { session: false }),
+  roleMiddleware('edit_project'),
+  upload.single('jobDescFile'),
+  async (req, res) => {
+    try {
+      const { projectId } = req.params;
+      const project = await Project.findById(projectId);
+      
+      if (!project) {
+        return res.status(404).json({ error: 'Project not found' });
+      }
+
+      const newRole = {
+        title: req.body.title,
+        location: req.body.location,
+        salary: req.body.salary,
+        currency: req.body.currency,
+        deadline: req.body.deadline,
+        startDate: req.body.startDate,
+        endDate: req.body.endDate,
+        jobDescFilePath: req.file ? req.file.path : '',
+      };
+
+      project.roles.push(newRole);
+      await project.save();
+
+      res.json({ 
+        message: 'Role added successfully', 
+        project,
+        newRole 
+      });
+    } catch (error) {
+      console.error('Error adding role:', error);
+      res.status(500).json({ error: 'Failed to add role' });
+    }
+  }
+);
+
+/**
+ * @route DELETE /api/projects/:projectId/roles/:roleIndex
+ * @desc Delete a specific role from a project
+ * @access Project Initiator, Admin
+ */
+router.delete(
+  '/:projectId/roles/:roleIndex',
+  passport.authenticate('jwt', { session: false }),
+  roleMiddleware('edit_project'),
+  async (req, res) => {
+    try {
+      const { projectId, roleIndex } = req.params;
+      const project = await Project.findById(projectId);
+      
+      if (!project) {
+        return res.status(404).json({ error: 'Project not found' });
+      }
+
+      const index = parseInt(roleIndex);
+      if (index < 0 || index >= project.roles.length) {
+        return res.status(400).json({ error: 'Invalid role index' });
+      }
+
+      // Remove the role at the specified index
+      const removedRole = project.roles.splice(index, 1)[0];
+      await project.save();
+
+      res.json({ 
+        message: 'Role deleted successfully', 
+        project,
+        removedRole 
+      });
+    } catch (error) {
+      console.error('Error deleting role:', error);
+      res.status(500).json({ error: 'Failed to delete role' });
+    }
+  }
+);
+
+/**
+ * @route PUT /api/projects/:projectId/roles/:roleIndex
+ * @desc Update a specific role in a project
+ * @access Project Initiator, Admin
+ */
+router.put(
+  '/:projectId/roles/:roleIndex',
+  passport.authenticate('jwt', { session: false }),
+  roleMiddleware('edit_project'),
+  upload.single('jobDescFile'),
+  async (req, res) => {
+    try {
+      const { projectId, roleIndex } = req.params;
+      const project = await Project.findById(projectId);
+      
+      if (!project) {
+        return res.status(404).json({ error: 'Project not found' });
+      }
+
+      const index = parseInt(roleIndex);
+      if (index < 0 || index >= project.roles.length) {
+        return res.status(400).json({ error: 'Invalid role index' });
+      }
+
+      // Update the role at the specified index
+      const updatedRole = {
+        title: req.body.title,
+        location: req.body.location,
+        salary: req.body.salary,
+        currency: req.body.currency,
+        deadline: req.body.deadline,
+        startDate: req.body.startDate,
+        endDate: req.body.endDate,
+        jobDescFilePath: req.file ? req.file.path : project.roles[index].jobDescFilePath,
+      };
+
+      project.roles[index] = updatedRole;
+      await project.save();
+
+      res.json({ 
+        message: 'Role updated successfully', 
+        project,
+        updatedRole 
+      });
+    } catch (error) {
+      console.error('Error updating role:', error);
+      res.status(500).json({ error: 'Failed to update role' });
+    }
+  }
+);
+
+/**
  * @route DELETE /api/projects/:projectId
  * @desc Delete a project (soft delete or archive if needed)
  * @access Project Initiator, Admin
