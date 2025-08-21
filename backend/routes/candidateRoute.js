@@ -265,19 +265,23 @@ router.put(
       if (!candidate)
         return res.status(404).json({ error: "Candidate not found" });
 
-      const existingIndex = candidate.feedback.findIndex(
-        (fb) => fb.level === level
-      );
+      const nextFeedback = [...(candidate.feedback || [])];
+      const existingIndex = nextFeedback.findIndex((fb) => fb.level === level);
       if (existingIndex !== -1) {
-        candidate.feedback[existingIndex] = { level, comment, status };
+        nextFeedback[existingIndex] = { level, comment, status };
       } else {
-        candidate.feedback.push({ level, comment, status });
+        nextFeedback.push({ level, comment, status });
       }
 
-      await candidate.save();
-      res.json({
+      const updatedCandidate = await Candidate.findByIdAndUpdate(
+        id,
+        { feedback: nextFeedback },
+        { new: true, runValidators: false }
+      );
+
+      return res.json({
         message: "Feedback saved successfully",
-        feedback: candidate.feedback,
+        feedback: updatedCandidate.feedback,
       });
     } catch (err) {
       console.error("Error saving feedback:", err);
