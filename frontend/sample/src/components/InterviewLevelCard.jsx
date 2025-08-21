@@ -4,8 +4,8 @@ import styles from "./InterviewLevelCard.module.css";
 
 const getLevelDescription = (level) => {
   const levelDescriptions = {
-    'L1': 'Technical Assessment/First Round',
-    'L2': 'Technical Interview/Second Round',
+    'L1': 'Technical Assessment',
+    'L2': 'Technical Interview',
     'L3': 'System Design/Architecture Round',
     'L4': 'Managerial/Leadership Interview',
     'L5': 'Cultural Fit/HR Interview',
